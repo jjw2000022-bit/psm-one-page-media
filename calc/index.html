@@ -1,0 +1,1762 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="CO₂ 소화설비 질식, LEL 폭발방지 환기, 소화기·스프링클러 수원, 제연설비 배출량을 법 기준·사고 사례·면접 질문과 함께 계산하는 안전 계산기">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>소방·안전 통합 계산기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: 위 고정 바(브랜드 + 계산기 탭 + 계산하기/설명서 탭), 아래 한 번에 한 화면(홈 또는 계산기 하나). */
+:root{
+  --bg:#f4f3f1; --surface:#ffffff; --ink:#1e1c1b; --muted:#66615c; --line:#dcd8d3;
+  --accent:#b3261e; --accent-soft:#f6e5e3; --bar:#1e1c1b; --bar-ink:#f4f3f1; --bar-muted:#a8a29c;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141312; --surface:#1d1b1a; --ink:#ece8e4; --muted:#a39d97; --line:#34302d;
+  --accent:#f2766b; --accent-soft:#3a1f1c; --bar:#0d0c0c; --bar-ink:#ece8e4; --bar-muted:#8f8983; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141312; --surface:#1d1b1a; --ink:#ece8e4; --muted:#a39d97; --line:#34302d;
+  --accent:#f2766b; --accent-soft:#3a1f1c; --bar:#0d0c0c; --bar-ink:#ece8e4; --bar-muted:#8f8983; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+main{word-break:keep-all;overflow-wrap:break-word}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bar);color:var(--bar-ink)}
+.tb-in{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:20px;min-height:52px}
+.brand{color:var(--bar-ink);text-decoration:none;font-weight:700;font-size:14px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.brand i{width:10px;height:10px;border-radius:2px;background:var(--accent);display:inline-block}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{color:var(--bar-muted);text-decoration:none;font-size:13px;padding:14px 10px;white-space:nowrap;border-bottom:2px solid transparent}
+.tabs a:hover{color:var(--bar-ink)}
+.tabs a[aria-current="page"]{color:var(--bar-ink);border-bottom-color:var(--accent);font-weight:700}
+.tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media (max-width:640px){.tb-in{flex-wrap:wrap;gap:0}.brand{padding-top:10px}.tabs{width:100%}}
+#subnav{background:var(--surface);border-bottom:1px solid var(--line)}
+#subnav .sn-in{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:4px}
+#subnav button{font:inherit;font-size:13px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:10px 12px;cursor:pointer;border-radius:0}
+#subnav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink);font-weight:700}
+#subnav button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* 홈 */
+.home{max-width:1120px;margin:0 auto;padding-block:40px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+.hero{display:grid;gap:10px;max-width:760px}
+.hero .eyebrow{font:600 12px var(--f-num);letter-spacing:.12em;color:var(--accent)}
+.hero h1{font-size:clamp(28px,5vw,44px);line-height:1.2;margin:0;text-wrap:balance}
+.hero p{margin:0;color:var(--muted);font-size:16px;max-width:60ch}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.home-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:grid;gap:6px;align-content:start;text-decoration:none;color:var(--ink);position:relative;min-width:0}
+.home-card:hover{border-color:var(--ink)}
+.home-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.home-no{font:600 13px var(--f-num);color:var(--accent)}
+.home-card h3{margin:0;font-size:18px}
+.home-card p{margin:0;font-size:14px;color:var(--muted)}
+.home-std{font:500 12px var(--f-num);color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:6px}
+.home-sec{display:grid;gap:12px}
+.home-sec h2{font-size:18px;margin:0}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.feat div{border-left:3px solid var(--accent);padding:4px 12px;display:grid;gap:2px}
+.feat b{font-size:14px}
+.feat span{font-size:13px;color:var(--muted)}
+.check{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.check table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+.check th,.check td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left}
+.check tr:last-child td{border-bottom:0}
+.check th{font-size:12px;font-weight:500;color:var(--muted)}
+.check td.n{font-family:var(--f-num);text-align:right;white-space:nowrap}
+.check td.ok{color:var(--accent);font-weight:700;white-space:nowrap}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:4px}
+
+/* 설명서 (계산기 섹션 안에서 그 계산기의 색 토큰을 그대로 씀) */
+.guide{max-width:820px;margin:0 auto;padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:14px}
+.guide h2{font-size:clamp(22px,3.6vw,28px);margin:0 0 4px;text-wrap:balance}
+.guide h3{font-size:16px;margin:18px 0 0;padding-top:14px;border-top:1px solid var(--line)}
+.guide p,.guide li{font-size:15px;margin:0}
+.guide ul,.guide ol{margin:0;padding-left:22px;display:grid;gap:6px}
+.guide .g-lead{font-size:17px;color:var(--ink);max-width:62ch}
+.g-tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.g-tbl table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+.g-tbl th,.g-tbl td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.g-tbl tr:last-child td{border-bottom:0}
+.g-tbl th{font-size:12px;font-weight:500;color:var(--muted)}
+.g-tbl td:first-child{font-weight:700;white-space:nowrap}
+.g-steps{counter-reset:s;list-style:none;padding-left:0!important}
+.g-steps li{counter-increment:s;position:relative;padding:10px 12px 10px 44px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.g-steps li::before{content:counter(s);position:absolute;left:12px;top:10px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--surface);font:600 12px/22px var(--f-num);text-align:center}
+.g-f{font:500 13px/1.8 var(--f-num);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto;margin:0;white-space:pre}
+.g-src{font-size:12px!important;color:var(--muted)}
+.guide button.g-try:is(#_,*){justify-self:start;font:inherit;font-size:14px;font-weight:700;background:var(--accent);border:1px solid var(--accent);color:var(--surface);border-radius:8px;padding:9px 14px;cursor:pointer}
+.guide button.g-try:is(#_,*):focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* CO₂ 소화설비 질식 */
+#s-co2{--bg:#f3f5f4; --surface:#ffffff; --ink:#18221f; --muted:#5b6a65; --line:#d6ddda;
+  --accent:#1f6b5c; --accent-soft:#e1efeb;
+  --ok:#2f7d46; --warn:#b7791f; --danger:#b42318; --danger-soft:#fbe9e7;
+  --o2:#2563a8; --co2:#b42318;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #s-co2{--bg:#111816; --surface:#18211e; --ink:#e4ece9; --muted:#9aaba5; --line:#2c3a36;
+  --accent:#5fbfa9; --accent-soft:#1d322d;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c; --danger-soft:#3a1f1c;
+  --o2:#78a9e6; --co2:#f0796c; color-scheme:dark}}
+:root[data-theme="dark"] #s-co2{--bg:#111816; --surface:#18211e; --ink:#e4ece9; --muted:#9aaba5; --line:#2c3a36;
+  --accent:#5fbfa9; --accent-soft:#1d322d;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c; --danger-soft:#3a1f1c;
+  --o2:#78a9e6; --co2:#f0796c; color-scheme:dark}
+#s-co2 *{box-sizing:border-box}
+#s-co2{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+#s-co2 .wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+#s-co2 header{display:grid;gap:6px}
+#s-co2 .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+#s-co2 h1{font-size:clamp(24px,4vw,32px);line-height:1.25;margin:0;text-wrap:balance}
+#s-co2 .lead{margin:0;color:var(--muted);max-width:62ch}
+#s-co2 .grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){#s-co2 .grid{grid-template-columns:minmax(0,1fr)}}
+#s-co2 .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:16px;min-width:0}
+#s-co2 .panel h2{font-size:15px;margin:0}
+#s-co2 .field{display:grid;gap:4px}
+#s-co2 .field label{font-size:13px;font-weight:500}
+#s-co2 .field .hint{font-size:12px;color:var(--muted)}
+#s-co2 .inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+#s-co2 .inp input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 15px var(--f-num);padding:9px 10px}
+#s-co2 .inp span{padding:0 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+#s-co2 .inp:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+#s-co2 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#s-co2 .btns{display:flex;gap:8px;flex-wrap:wrap}
+#s-co2 button{font:inherit;font-size:13px;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#s-co2 button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+#s-co2 button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#s-co2 .example{font-size:12px;color:var(--muted);background:var(--accent-soft);border-radius:6px;padding:8px 10px}
+#s-co2 .steps{display:grid;gap:16px;min-width:0}
+#s-co2 .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+#s-co2 .step-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#s-co2 .step-no{font:600 12px var(--f-num);color:var(--accent)}
+#s-co2 .step h3{margin:0;font-size:16px}
+#s-co2 .big{display:flex;gap:28px;flex-wrap:wrap}
+#s-co2 .metric{display:grid;gap:2px}
+#s-co2 .metric .v{font:600 clamp(24px,3.6vw,30px)/1.1 var(--f-num);font-variant-numeric:tabular-nums}
+#s-co2 .metric .v small{font-size:14px;font-weight:500;color:var(--muted);margin-left:3px}
+#s-co2 .metric .k{font-size:12px;color:var(--muted)}
+#s-co2 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+#s-co2 .pill.ok{color:var(--ok)}
+#s-co2 .pill.warn{color:var(--warn)}
+#s-co2 .pill.danger{color:var(--danger);background:var(--danger-soft)}
+#s-co2 .gauge{position:relative;height:14px;border-radius:7px;overflow:hidden;display:flex}
+#s-co2 .gauge i{display:block;height:100%}
+#s-co2 .gauge-wrap{display:grid;gap:4px}
+#s-co2 .gauge-marker{position:relative;height:18px}
+#s-co2 .gauge-marker b{position:absolute;top:0;transform:translateX(-50%);font:600 11px var(--f-num);color:var(--ink);white-space:nowrap}
+#s-co2 .gauge-scale{display:flex;justify-content:space-between;font:500 11px var(--f-num);color:var(--muted)}
+#s-co2 .note{font-size:13px;color:var(--muted);margin:0}
+#s-co2 .callout{border-left:3px solid var(--danger);background:var(--danger-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:14px}
+#s-co2 .chart{width:100%;overflow-x:auto}
+#s-co2 .chart svg{display:block;width:100%;height:auto;min-width:320px}
+#s-co2 .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+#s-co2 .legend span::before{content:"";display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:middle;background:var(--c)}
+#s-co2 .lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+#s-co2 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;align-content:start;min-width:0}
+#s-co2 .card h3{margin:0;font-size:15px}
+#s-co2 .card p,#s-co2 .card li{font-size:14px;margin:0}
+#s-co2 .card ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#s-co2 .basis{font:500 13px/1.7 var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;margin:0}
+#s-co2 .src{font-size:12px;color:var(--muted)}
+#s-co2 details summary{cursor:pointer;font-weight:700;font-size:14px}
+#s-co2 details[open] summary{margin-bottom:8px}
+@media (prefers-reduced-motion:no-preference){#s-co2 .gauge i{transition:flex-basis .3s}}
+/* LEL 폭발방지 환기 */
+#s-lel{--bg:#f5f3f0; --surface:#ffffff; --ink:#221c18; --muted:#6a5f58; --line:#ddd6d0;
+  --accent:#b4501d; --accent-soft:#f6e8df;
+  --ok:#2f7d46; --warn:#b7791f; --danger:#b42318; --danger-soft:#fbe9e7;
+  --fire:#c2410c; --health:#2563a8;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #s-lel{--bg:#171310; --surface:#201a16; --ink:#efe7e1; --muted:#ab9d93; --line:#3a302a;
+  --accent:#f08a4b; --accent-soft:#3a2518;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c; --danger-soft:#3a1f1c;
+  --fire:#f08a4b; --health:#78a9e6; color-scheme:dark}}
+:root[data-theme="dark"] #s-lel{--bg:#171310; --surface:#201a16; --ink:#efe7e1; --muted:#ab9d93; --line:#3a302a;
+  --accent:#f08a4b; --accent-soft:#3a2518;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c; --danger-soft:#3a1f1c;
+  --fire:#f08a4b; --health:#78a9e6; color-scheme:dark}
+#s-lel *{box-sizing:border-box}
+#s-lel{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+#s-lel .wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+#s-lel header{display:grid;gap:6px}
+#s-lel .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+#s-lel h1{font-size:clamp(24px,4vw,32px);line-height:1.25;margin:0;text-wrap:balance}
+#s-lel .lead{margin:0;color:var(--muted);max-width:62ch}
+#s-lel .grid{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){#s-lel .grid{grid-template-columns:minmax(0,1fr)}}
+#s-lel .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:16px;min-width:0}
+#s-lel .panel h2{font-size:15px;margin:0}
+#s-lel .panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#s-lel .field{display:grid;gap:4px}
+#s-lel .field label,#s-lel .lbl{font-size:13px;font-weight:500}
+#s-lel .field .hint{font-size:12px;color:var(--muted)}
+#s-lel .inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+#s-lel .inp input,#s-lel .inp select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 15px var(--f-num);padding:9px 10px}
+#s-lel .inp select{font-family:var(--f-body);font-size:14px}
+#s-lel .inp span{padding:0 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+#s-lel .inp:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+#s-lel .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#s-lel .btns{display:flex;gap:8px;flex-wrap:wrap}
+#s-lel button{font:inherit;font-size:13px;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#s-lel button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+#s-lel button.del{padding:6px 10px;color:var(--muted)}
+#s-lel button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#s-lel .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+#s-lel .seg label{flex:1;text-align:center;font-size:13px;padding:8px 6px;cursor:pointer}
+#s-lel .seg input{position:absolute;opacity:0;pointer-events:none}
+#s-lel .seg input:checked+span{font-weight:700;color:var(--accent)}
+#s-lel .seg label:has(input:checked){background:var(--accent-soft)}
+#s-lel .seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
+#s-lel .example{font-size:12px;color:var(--muted);background:var(--accent-soft);border-radius:6px;padding:8px 10px}
+#s-lel .comps{display:grid;gap:12px}
+#s-lel .comp{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:10px;background:var(--bg)}
+#s-lel .comp .inp{background:var(--surface)}
+#s-lel .comp-head{display:flex;gap:8px;align-items:end}
+#s-lel .comp-head .field{flex:1;min-width:0}
+#s-lel .comp-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:820px){#s-lel .comp-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:420px){#s-lel .comp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#s-lel .comp-grid label{font-size:12px;color:var(--muted)}
+#s-lel .comp-grid .inp input{font-size:14px;padding:7px 8px}
+#s-lel .comp-grid .inp span{padding:0 6px;font-size:11px}
+#s-lel .comp-src{font-size:11px;color:var(--muted)}
+#s-lel .steps{display:grid;gap:16px;min-width:0}
+#s-lel .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+#s-lel .step-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#s-lel .step-no{font:600 12px var(--f-num);color:var(--accent)}
+#s-lel .step h3{margin:0;font-size:16px}
+#s-lel .big{display:flex;gap:28px;flex-wrap:wrap}
+#s-lel .metric{display:grid;gap:2px}
+#s-lel .metric .v{font:600 clamp(24px,3.6vw,30px)/1.1 var(--f-num);font-variant-numeric:tabular-nums}
+#s-lel .metric .v small{font-size:14px;font-weight:500;color:var(--muted);margin-left:3px}
+#s-lel .metric .k{font-size:12px;color:var(--muted)}
+#s-lel .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+#s-lel .pill.ok{color:var(--ok)}
+#s-lel .pill.warn{color:var(--warn)}
+#s-lel .pill.danger{color:var(--danger);background:var(--danger-soft)}
+#s-lel .tbl{overflow-x:auto}
+#s-lel .tbl table{border-collapse:collapse;width:100%;font-size:13px;min-width:420px}
+#s-lel .tbl th,#s-lel .tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+#s-lel .tbl th:first-child,#s-lel .tbl td:first-child{text-align:left}
+#s-lel .tbl th{font-weight:500;color:var(--muted);font-size:12px}
+#s-lel .tbl td{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+#s-lel .tbl td:first-child{font-family:var(--f-body)}
+#s-lel .tbl tfoot td{font-weight:700;border-bottom:0}
+#s-lel .note{font-size:13px;color:var(--muted);margin:0}
+#s-lel .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:14px}
+#s-lel .bars{display:grid;gap:10px}
+#s-lel .bar{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center}
+#s-lel .bar .name{font-size:13px}
+#s-lel .bar .track{position:relative;height:26px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+#s-lel .bar .fill{height:100%;border-radius:5px 0 0 5px;min-width:3px}
+#s-lel .bar .val{position:absolute;top:50%;transform:translateY(-50%);font:600 12px var(--f-num);color:var(--ink);white-space:nowrap}
+#s-lel .scale-note{font-size:12px;color:var(--muted)}
+#s-lel .lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+#s-lel .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;align-content:start;min-width:0}
+#s-lel .card h3{margin:0;font-size:15px}
+#s-lel .card p,#s-lel .card li{font-size:14px;margin:0}
+#s-lel .card ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#s-lel .basis{font:500 13px/1.7 var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;margin:0}
+#s-lel .src{font-size:12px;color:var(--muted)}
+#s-lel details summary{cursor:pointer;font-weight:700;font-size:14px}
+#s-lel details[open] summary{margin-bottom:8px}
+@media (prefers-reduced-motion:no-preference){#s-lel .bar .fill{transition:width .3s}}
+/* 소화기·스프링클러 수원 */
+#s-ext{--bg:#f6f3f2; --surface:#ffffff; --ink:#241b1a; --muted:#6b5e5c; --line:#ded5d3;
+  --accent:#b3261e; --accent-soft:#f8e6e4;
+  --ok:#2f7d46; --warn:#b7791f; --water:#1f6fa8; --water-soft:#e2eef7;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #s-ext{--bg:#171212; --surface:#211a19; --ink:#efe6e4; --muted:#ab9c99; --line:#3b302e;
+  --accent:#f2766b; --accent-soft:#3a1f1c;
+  --ok:#6cc58a; --warn:#e2ad55; --water:#73aee0; --water-soft:#18293a; color-scheme:dark}}
+:root[data-theme="dark"] #s-ext{--bg:#171212; --surface:#211a19; --ink:#efe6e4; --muted:#ab9c99; --line:#3b302e;
+  --accent:#f2766b; --accent-soft:#3a1f1c;
+  --ok:#6cc58a; --warn:#e2ad55; --water:#73aee0; --water-soft:#18293a; color-scheme:dark}
+#s-ext *{box-sizing:border-box}
+#s-ext{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+#s-ext .wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+#s-ext header{display:grid;gap:6px}
+#s-ext .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+#s-ext h1{font-size:clamp(24px,4vw,32px);line-height:1.25;margin:0;text-wrap:balance}
+#s-ext .lead{margin:0;color:var(--muted);max-width:62ch}
+#s-ext .grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){#s-ext .grid{grid-template-columns:minmax(0,1fr)}}
+#s-ext .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:16px;min-width:0}
+#s-ext .panel h2{font-size:15px;margin:0}
+#s-ext .field{display:grid;gap:4px}
+#s-ext .field label,#s-ext .lbl{font-size:13px;font-weight:500}
+#s-ext .field .hint{font-size:12px;color:var(--muted)}
+#s-ext .inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+#s-ext .inp input,#s-ext .inp select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 15px var(--f-num);padding:9px 10px}
+#s-ext .inp select{font-family:var(--f-body);font-size:14px}
+#s-ext .inp span{padding:0 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+#s-ext .inp:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+#s-ext .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#s-ext .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}
+#s-ext .chk input{margin-top:4px;accent-color:var(--accent)}
+#s-ext .chk[hidden]{display:none}
+#s-ext .btns{display:flex;gap:8px;flex-wrap:wrap}
+#s-ext button{font:inherit;font-size:13px;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#s-ext button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#s-ext .example{font-size:12px;color:var(--muted);background:var(--accent-soft);border-radius:6px;padding:8px 10px;margin:0}
+#s-ext .steps{display:grid;gap:16px;min-width:0}
+#s-ext .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+#s-ext .step-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#s-ext .step-no{font:600 12px var(--f-num);color:var(--accent)}
+#s-ext .step h3{margin:0;font-size:16px}
+#s-ext .big{display:flex;gap:28px;flex-wrap:wrap}
+#s-ext .metric{display:grid;gap:2px}
+#s-ext .metric .v{font:600 clamp(24px,3.6vw,30px)/1.1 var(--f-num);font-variant-numeric:tabular-nums}
+#s-ext .metric .v small{font-size:14px;font-weight:500;color:var(--muted);margin-left:3px}
+#s-ext .metric .k{font-size:12px;color:var(--muted)}
+#s-ext .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+#s-ext .pill.ok{color:var(--ok)}
+#s-ext .pill.warn{color:var(--warn)}
+#s-ext .note{font-size:13px;color:var(--muted);margin:0}
+#s-ext .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:14px}
+#s-ext .callout.water{border-color:var(--water);background:var(--water-soft)}
+#s-ext .ext-row{display:flex;flex-wrap:wrap;gap:6px;align-items:end}
+#s-ext .ext-row svg{width:22px;height:34px;color:var(--accent)}
+#s-ext .ext-row .more{font:600 13px var(--f-num);color:var(--muted)}
+#s-ext .tank{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+#s-ext .tank svg{width:96px;height:auto}
+#s-ext .formula{font:500 14px var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:nowrap}
+#s-ext .tbl{overflow-x:auto}
+#s-ext .tbl table{border-collapse:collapse;width:100%;font-size:13px;min-width:360px}
+#s-ext .tbl th,#s-ext .tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+#s-ext .tbl th{font-weight:500;color:var(--muted);font-size:12px}
+#s-ext .tbl th:not(:first-child){white-space:nowrap;text-align:right}
+#s-ext .tbl td.n{font-family:var(--f-num);text-align:right;white-space:nowrap}
+#s-ext .tbl tr.on td{background:var(--accent-soft);font-weight:700}
+#s-ext .lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+#s-ext .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;align-content:start;min-width:0}
+#s-ext .card h3{margin:0;font-size:15px}
+#s-ext .card p,#s-ext .card li{font-size:14px;margin:0}
+#s-ext .card ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#s-ext .basis{font:500 13px/1.7 var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;margin:0}
+#s-ext .src{font-size:12px;color:var(--muted)}
+#s-ext details summary{cursor:pointer;font-weight:700;font-size:14px}
+#s-ext details[open] summary{margin-bottom:8px}
+/* 제연설비 배출량 */
+#s-smoke{--bg:#f3f4f6; --surface:#ffffff; --ink:#1c2029; --muted:#5d6472; --line:#d7dbe2;
+  --accent:#4a4fa8; --accent-soft:#e7e8f6;
+  --ok:#2f7d46; --warn:#b7791f; --danger:#b42318;
+  --smoke:#6b7280; --air:#1f6fa8;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #s-smoke{--bg:#13151a; --surface:#1b1e25; --ink:#e6e8ee; --muted:#9ca3b2; --line:#2f3440;
+  --accent:#9ea3f0; --accent-soft:#25274a;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c;
+  --smoke:#a3a9b6; --air:#73aee0; color-scheme:dark}}
+:root[data-theme="dark"] #s-smoke{--bg:#13151a; --surface:#1b1e25; --ink:#e6e8ee; --muted:#9ca3b2; --line:#2f3440;
+  --accent:#9ea3f0; --accent-soft:#25274a;
+  --ok:#6cc58a; --warn:#e2ad55; --danger:#f0796c;
+  --smoke:#a3a9b6; --air:#73aee0; color-scheme:dark}
+#s-smoke *{box-sizing:border-box}
+#s-smoke{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+#s-smoke .wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+#s-smoke header{display:grid;gap:6px}
+#s-smoke .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+#s-smoke h1{font-size:clamp(24px,4vw,32px);line-height:1.25;margin:0;text-wrap:balance}
+#s-smoke .lead{margin:0;color:var(--muted);max-width:62ch}
+#s-smoke .grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){#s-smoke .grid{grid-template-columns:minmax(0,1fr)}}
+#s-smoke .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:16px;min-width:0}
+#s-smoke .panel h2{font-size:15px;margin:0}
+#s-smoke .field{display:grid;gap:4px}
+#s-smoke .field label,#s-smoke .lbl{font-size:13px;font-weight:500}
+#s-smoke .field .hint{font-size:12px;color:var(--muted)}
+#s-smoke .field[hidden]{display:none}
+#s-smoke .inp{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:hidden}
+#s-smoke .inp input,#s-smoke .inp select{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:500 15px var(--f-num);padding:9px 10px}
+#s-smoke .inp select{font-family:var(--f-body);font-size:14px}
+#s-smoke .inp span{padding:0 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+#s-smoke .inp:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+#s-smoke .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#s-smoke .btns{display:flex;gap:8px;flex-wrap:wrap}
+#s-smoke button{font:inherit;font-size:13px;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+#s-smoke button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#s-smoke .example{font-size:12px;color:var(--muted);background:var(--accent-soft);border-radius:6px;padding:8px 10px;margin:0}
+#s-smoke .steps{display:grid;gap:16px;min-width:0}
+#s-smoke .step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:12px;min-width:0}
+#s-smoke .step-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#s-smoke .step-no{font:600 12px var(--f-num);color:var(--accent)}
+#s-smoke .step h3{margin:0;font-size:16px}
+#s-smoke .big{display:flex;gap:28px;flex-wrap:wrap}
+#s-smoke .metric{display:grid;gap:2px}
+#s-smoke .metric .v{font:600 clamp(24px,3.6vw,30px)/1.1 var(--f-num);font-variant-numeric:tabular-nums}
+#s-smoke .metric .v small{font-size:14px;font-weight:500;color:var(--muted);margin-left:3px}
+#s-smoke .metric .k{font-size:12px;color:var(--muted)}
+#s-smoke .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid currentColor}
+#s-smoke .pill.ok{color:var(--ok)}
+#s-smoke .pill.warn{color:var(--warn)}
+#s-smoke .note{font-size:13px;color:var(--muted);margin:0}
+#s-smoke .callout{border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 12px;border-radius:0 6px 6px 0;font-size:14px}
+#s-smoke .tbl{overflow-x:auto}
+#s-smoke .tbl table{border-collapse:collapse;width:100%;font-size:13px;min-width:420px}
+#s-smoke .tbl th,#s-smoke .tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+#s-smoke .tbl th:first-child,#s-smoke .tbl td:first-child{text-align:left}
+#s-smoke .tbl th{font-weight:500;color:var(--muted);font-size:12px}
+#s-smoke .tbl td{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+#s-smoke .tbl td:first-child{font-family:var(--f-body)}
+#s-smoke .tbl td.on{background:var(--accent-soft);font-weight:700;outline:2px solid var(--accent);outline-offset:-2px}
+#s-smoke .ducts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+#s-smoke .duct{border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;background:var(--bg)}
+#s-smoke .duct svg{width:64px;height:64px}
+#s-smoke .duct .t{font-size:12px;color:var(--muted)}
+#s-smoke .duct .d{font:600 20px var(--f-num)}
+#s-smoke .duct .s{font-size:12px}
+#s-smoke .lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+#s-smoke .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;align-content:start;min-width:0}
+#s-smoke .card h3{margin:0;font-size:15px}
+#s-smoke .card p,#s-smoke .card li{font-size:14px;margin:0}
+#s-smoke .card ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#s-smoke .basis{font:500 13px/1.7 var(--f-num);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-wrap;overflow-x:auto;margin:0}
+#s-smoke .src{font-size:12px;color:var(--muted)}
+#s-smoke details summary{cursor:pointer;font-weight:700;font-size:14px}
+#s-smoke details[open] summary{margin-bottom:8px}
+</style>
+</head>
+<body>
+
+
+<div class="topbar">
+  <div class="tb-in">
+    <a class="brand" href="#home"><i></i>소방·안전 통합 계산기</a>
+    <nav class="tabs" aria-label="계산기"><a href="#home" data-go="home">홈</a><a href="#co2" data-go="co2">CO₂ 질식</a><a href="#lel" data-go="lel">폭발방지 환기</a><a href="#ext" data-go="ext">소화기·수원</a><a href="#smoke" data-go="smoke">제연 배출량</a></nav>
+  </div>
+</div>
+<div id="subnav" hidden><div class="sn-in" role="tablist" aria-label="보기 전환">
+  <button type="button" role="tab" data-pane="calc" aria-selected="true">계산하기</button>
+  <button type="button" role="tab" data-pane="guide" aria-selected="false">설명서</button>
+</div></div>
+
+<main>
+  <section class="home" id="s-home">
+    <div class="hero">
+      <div class="eyebrow">FIRE × SAFETY · CALCULATORS 04</div>
+      <h1>불·폭발·질식을 숫자로 설명하는 안전 계산기</h1>
+      <p>소방시설과 산업안전이 만나는 계산 네 가지를 한곳에 모았습니다. 결과마다 계산 근거, 법 기준, 사고 사례, 면접 질문이 붙어 있고, 계산기마다 처음 쓰는 사람을 위한 설명서가 있습니다.</p>
+    </div>
+
+    <div class="home-grid"><a class="home-card" href="#co2"><span class="home-no">01</span><h3>CO₂ 소화설비 질식</h3><p>CO₂가 방출된 방의 산소농도와 재진입까지 환기시간</p><span class="home-std">NFTC 106 · 안전보건규칙 제618조</span></a><a class="home-card" href="#lel"><span class="home-no">02</span><h3>LEL 폭발방지 환기</h3><p>용제 사용량으로 폭발방지·노출기준 환기량 비교</p><span class="home-std">작업환경공학 전체환기 · NIOSH</span></a><a class="home-card" href="#ext"><span class="home-no">03</span><h3>소화기·스프링클러 수원</h3><p>소화기 능력단위·개수와 스프링클러 수원량</p><span class="home-std">NFTC 101 · NFTC 103</span></a><a class="home-card" href="#smoke"><span class="home-no">04</span><h3>제연설비 배출량</h3><p>제연 배출량, 덕트 직경, 공기유입구, 배출기 동력</p><span class="home-std">NFTC 501</span></a></div>
+
+    <div class="home-sec">
+      <h2>계산기마다 들어 있는 것</h2>
+      <div class="feat">
+        <div><b>계산 근거</b><span>식에 숫자를 넣은 과정을 그대로 보여 주고 복사할 수 있습니다</span></div>
+        <div><b>관련 기준</b><span>NFTC, 산업안전보건기준에 관한 규칙 등 근거 조항</span></div>
+        <div><b>사고 사례</b><span>그 계산이 왜 중요한지 보여 주는 실제 사고</span></div>
+        <div><b>면접 질문</b><span>안전관리자 면접에서 나올 만한 질문과 답의 뼈대</span></div>
+        <div><b>설명서</b><span>입력 칸 뜻, 결과 읽는 법, 예시 따라 하기, 한계</span></div>
+      </div>
+    </div>
+
+    <div class="home-sec">
+      <h2>어떻게 검증했나요</h2>
+      <div class="check"><table>
+        <thead><tr><th>계산기</th><th>대조한 예제·원문</th><th>원문 값</th><th>계산기 값</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>폭발방지 환기</td><td>작업환경공학 강의 예제 1 (MEK + 톨루엔 상가작용)</td><td class="n">948.07 m³/min</td><td class="n">948.07 m³/min</td><td class="ok">일치</td></tr>
+          <tr><td>폭발방지 환기</td><td>작업환경공학 강의 (MEK 1.5 L/h, K = 7)</td><td class="n">235.44 m³/min</td><td class="n">235.44 m³/min</td><td class="ok">일치</td></tr>
+          <tr><td>CO₂ 질식</td><td>소화설비론 표 7.3 약제량 (150~1,450m³: 0.80kg/m³)</td><td class="n">320m³ → 256 kg</td><td class="n">256 kg</td><td class="ok">일치</td></tr>
+          <tr><td>소화기·수원</td><td>소화설비론 표 1.6, 표 4.7, 수원식</td><td class="n">30개 × 1.6 = 48 m³</td><td class="n">48.0 m³</td><td class="ok">일치</td></tr>
+          <tr><td>제연 배출량</td><td>NFTC 501 표 2.3.2.1 (40m 원 안, 2~2.5m)</td><td class="n">45,000 m³/h</td><td class="n">45,000 m³/h</td><td class="ok">일치</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="foot">
+      <span>학습·검토용 계산기입니다. 실제 설계와 판단은 NFTC 원문, 제품 MSDS, 현장 측정, 전문가 검토를 따르세요. 원문으로 확인하지 못한 값은 (추정)으로 표시했습니다.</span>
+      <span>만든 사람: Jaewon Jung · 자료: 국가화재안전기준 적용 소화설비론, NFTC 501(2024.10.1. 시행), 안전공학과 작업환경공학·화학공정안전 강의, NIOSH Pocket Guide</span>
+    </div>
+  </section>
+
+<section class="calc" id="s-co2" data-key="co2" hidden>
+<div class="pane" data-pane="calc"><div class="wrap">
+  <header>
+    <div class="eyebrow">소방 × 산업안전 · 계산기 1</div>
+    <h1>CO₂ 소화설비 질식 계산기</h1>
+    <p class="lead">방호구역 크기로 CO₂ 약제량을 구하고, 방출 직후 산소농도와 사람이 다시 들어가도 되는 상태까지 걸리는 환기시간을 계산합니다.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="c1-form" novalidate>
+      <h2>방호구역 조건</h2>
+      <div class="row2">
+        <div class="field"><label for="c1-w">가로</label><div class="inp"><input id="c1-w" type="number" step="any" min="0"><span>m</span></div></div>
+        <div class="field"><label for="c1-d">세로</label><div class="inp"><input id="c1-d" type="number" step="any" min="0"><span>m</span></div></div>
+      </div>
+      <div class="field"><label for="c1-h">높이</label><div class="inp"><input id="c1-h" type="number" step="any" min="0"><span>m</span></div></div>
+      <div class="field"><label for="c1-a">자동폐쇄장치 없는 개구부</label><div class="inp"><input id="c1-a" type="number" step="any" min="0"><span>m²</span></div><span class="hint">없으면 0. 1m²당 5kg을 더합니다.</span></div>
+      <div class="field"><label for="c1-t">실내 온도</label><div class="inp"><input id="c1-t" type="number" step="any"><span>℃</span></div></div>
+      <h2>환기 조건</h2>
+      <div class="field"><label for="c1-q">배출 풍량</label><div class="inp"><input id="c1-q" type="number" step="any" min="0"><span>m³/min</span></div></div>
+      <div class="field"><label for="c1-k">혼합 정도 k</label><div class="inp"><input id="c1-k" type="number" step="any" min="0.05" max="1"><span>0.1~1</span></div><span class="hint">1은 공기가 완전히 섞이는 이상적인 경우, 0.1~0.5는 구석에 가스가 고이는 실제 현장입니다.</span></div>
+      <div class="btns">
+        <button type="button" id="c1-ex">예시 불러오기</button>
+        <button type="button" id="c1-reset">초기화</button>
+      </div>
+      <p class="example" id="c1-exNote">예시: 10 × 8 × 4m 전기실, 개구부 없음, 배출 50 m³/min, k = 0.5</p>
+    </form>
+
+    <div class="steps" aria-live="polite">
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 1</span><h3>필요 약제량</h3></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c1-r-agent">–</span><span class="k">CO₂ 저장량 (전역방출 · 표면화재)</span></div>
+          <div class="metric"><span class="v" id="c1-r-vol">–</span><span class="k">방호구역 체적</span></div>
+          <div class="metric"><span class="v" id="c1-r-gas">–</span><span class="k">방출되는 CO₂ 기체 부피</span></div>
+        </div>
+        <p class="note" id="c1-r-agent-note"></p>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 2</span><h3>방출 직후 공기</h3><span class="pill" id="c1-r-pill">–</span></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c1-r-o2">–</span><span class="k">산소농도</span></div>
+          <div class="metric"><span class="v" id="c1-r-co2">–</span><span class="k">CO₂ 농도</span></div>
+        </div>
+        <div class="gauge-wrap">
+          <div class="gauge-marker"><b id="c1-g-mark">▼</b></div>
+          <div class="gauge" aria-hidden="true">
+            <i style="flex:0 0 47.6%;background:var(--danger)"></i>
+            <i style="flex:0 0 28.6%;background:var(--warn)"></i>
+            <i style="flex:0 0 9.5%;background:var(--ok)"></i>
+            <i style="flex:1;background:var(--line)"></i>
+          </div>
+          <div class="gauge-scale"><span>0%</span><span>10%</span><span>16%</span><span>18%</span><span>21%</span></div>
+        </div>
+        <p class="note">산소 18% 미만은 산소결핍(안전보건규칙 제618조). 16% 미만부터 판단력 저하, 10% 미만은 수 분 안에 의식을 잃을 수 있습니다.</p>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 3</span><h3>재진입까지 환기시간</h3></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c1-r-time">–</span><span class="k">산소 18% 이상 + CO₂ 1.5% 미만 (k 적용)</span></div>
+          <div class="metric"><span class="v" id="c1-r-ideal">–</span><span class="k">완전 혼합(k = 1)일 때</span></div>
+          <div class="metric"><span class="v" id="c1-r-ach">–</span><span class="k">시간당 공기교환횟수</span></div>
+        </div>
+        <div class="callout" id="c1-r-insight"></div>
+        <div class="chart"><svg id="c1-chart" viewBox="0 0 640 260" role="img" aria-label="환기시간에 따른 산소와 CO₂ 농도 변화"></svg></div>
+        <div class="legend"><span style="--c:var(--o2)">산소 O₂ (%)</span><span style="--c:var(--co2)">CO₂ (%)</span><span style="--c:var(--muted)">기준선 18% · 1.5%</span></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="lower">
+    <section class="card">
+      <h3>계산 근거</h3>
+      <pre class="basis" id="c1-basis"></pre>
+      <div class="btns"><button type="button" id="c1-copy">계산 근거 복사</button></div>
+      <p class="src">단순 혼합 모델이라 누설·국소 고임은 반영하지 않습니다. 실제 설계는 NFTC 106과 제조사 설계서를 따릅니다.</p>
+    </section>
+    <section class="card">
+      <h3>관련 기준</h3>
+      <ul>
+        <li>이산화탄소소화설비의 화재안전기술기준(NFTC 106): 약제량 표, 개구부 가산량, 지연장치 20초 이상</li>
+        <li>산업안전보건기준에 관한 규칙 제618조: 적정공기 = 산소 18% 이상 23.5% 미만, CO₂ 1.5% 미만</li>
+        <li>같은 규칙 밀폐공간 작업 프로그램: 작업 전 산소·유해가스 측정, 환기, 감시인 배치</li>
+      </ul>
+      <p class="src">출처: 국가화재안전기준 적용 소화설비론 236·240·241쪽, 작업환경공학 강의(전체환기 농도 감소식), 화학공정안전 Box model 강의.</p>
+    </section>
+    <section class="card">
+      <h3>사고 사례</h3>
+      <ul>
+        <li>2018년 삼성전자 기흥사업장: 전기실 CO₂ 소화설비 누출로 협력업체 근로자 2명 사망</li>
+        <li>2021년 서울 금천구 신축건물: 지하 전기실 CO₂ 소화설비 방출로 작업자 2명 사망</li>
+      </ul>
+      <p class="note">두 사고 모두 방출 표시와 대피, 수동 차단 조작 절차가 쟁점이었습니다.</p>
+    </section>
+    <section class="card">
+      <h3>면접 질문</h3>
+      <details>
+        <summary>CO₂ 소화설비가 있는 전기실에서 작업하기 전에 무엇을 확인하겠습니까?</summary>
+        <ul>
+          <li>소화설비를 자동에서 수동으로 전환하고 기동용기 안전핀 체결 확인</li>
+          <li>방출표시등·경보·지연장치(20초 이상)가 작동하는지 확인</li>
+          <li>산소농도 측정, 감시인 배치, 대피로 확보</li>
+          <li>작업이 끝나면 자동 전환을 원래대로 복구하고 기록</li>
+        </ul>
+      </details>
+      <details>
+        <summary>방출 후 산소가 18%로 돌아오면 바로 들어가도 됩니까?</summary>
+        <p>아닙니다. 이 계산기처럼 CO₂ 농도가 1.5% 아래로 떨어지는 데 더 오래 걸리는 경우가 많고, 구석이나 바닥에는 무거운 CO₂가 고여 있을 수 있습니다. 여러 지점에서 측정한 뒤 들어갑니다.</p>
+      </details>
+    </section>
+  </div>
+</div></div>
+<div class="pane" data-pane="guide" hidden><article class="guide" data-pfx="c1-"><div class="eyebrow">설명서 · CO₂ 소화설비 질식</div><h2>CO₂ 소화설비 질식 계산기 사용법</h2>
+<p class="g-lead">CO₂ 소화설비가 터지면 방 안 산소가 얼마나 떨어지는지, 그리고 환기를 몇 분 해야 사람이 다시 들어가도 되는지를 계산합니다.</p>
+
+<h3>언제 쓰나요</h3>
+<ul>
+  <li>전기실·발전기실·서버실처럼 CO₂ 소화설비가 있는 곳에서 작업하기 전 위험성평가를 할 때</li>
+  <li>CO₂가 잘못 방출된 뒤 "언제 들어가도 되나"를 판단해야 할 때</li>
+  <li>밀폐공간 작업 교육에서 "산소만 재면 안 된다"를 숫자로 보여 줄 때</li>
+</ul>
+
+<h3>입력 칸 설명</h3>
+<div class="g-tbl"><table>
+  <thead><tr><th>칸</th><th>뜻</th><th>어디서 찾나요</th></tr></thead>
+  <tbody>
+    <tr><td>가로·세로·높이</td><td>CO₂가 퍼지는 방(방호구역)의 크기</td><td>도면 또는 줄자로 실측</td></tr>
+    <tr><td>개구부</td><td>문이 열려 있어도 자동으로 닫히지 않는 구멍의 면적. 1m²당 약제 5kg을 더 넣습니다</td><td>현장 확인. 없으면 0</td></tr>
+    <tr><td>실내 온도</td><td>CO₂가 기체가 됐을 때 부피를 계산하는 데 씁니다</td><td>보통 20℃</td></tr>
+    <tr><td>배출 풍량</td><td>방 공기를 빼내는 팬의 능력</td><td>배기팬 명판, 이동식 송풍기 용량</td></tr>
+    <tr><td>혼합 정도 k</td><td>공기가 얼마나 고르게 섞이는지. 1이면 완벽, 작을수록 구석에 가스가 남습니다</td><td>모르면 0.5. 칸막이·피트가 많으면 0.1~0.3</td></tr>
+  </tbody>
+</table></div>
+
+<h3>결과 읽는 법</h3>
+<ol>
+  <li><b>STEP 1 약제량</b>은 NFTC 106 표로 계산한 설계 저장량입니다. 실제 저장량은 설비 명판과 설계서로 확인하세요.</li>
+  <li><b>STEP 2 방출 직후 공기</b>는 약제가 다 나왔을 때 산소와 CO₂ 농도입니다. 산소 18% 미만이면 산소결핍, 16% 미만부터는 판단력이 떨어지고 10% 미만이면 몇 분 안에 쓰러질 수 있습니다.</li>
+  <li><b>STEP 3 환기시간</b>은 산소 18% 이상과 CO₂ 1.5% 미만을 <em>둘 다</em> 만족할 때까지 걸리는 시간입니다. 그래프에서 두 선이 기준선을 넘는 시점을 보세요.</li>
+</ol>
+
+<h3>예시로 따라 해 보기</h3>
+<ol class="g-steps">
+  <li>10 × 8 × 4m 전기실의 체적은 <b>320m³</b>입니다.</li>
+  <li>150~1,450m³ 구간은 1m³당 0.80kg이라 약제는 320 × 0.8 = <b>256kg</b>입니다.</li>
+  <li>CO₂ 1kg은 20℃에서 약 0.546m³의 기체가 되므로, 256kg은 약 140m³로 퍼집니다.</li>
+  <li>방 안 산소는 21 × 320 / (320 + 140) = <b>14.6%</b>, CO₂는 <b>30.4%</b>가 됩니다.</li>
+  <li>50m³/min으로 빼내도 k = 0.5면 실제로는 25m³/min만 효과가 있습니다. 산소는 약 10분, CO₂는 약 <b>39분</b> 뒤에 기준을 만족합니다.</li>
+</ol>
+<button type="button" class="g-try" data-try="ex">이 예시로 계산해 보기</button>
+
+<h3>꼭 알아 둘 점</h3>
+<ul>
+  <li>공기가 고르게 섞인다고 가정한 계산입니다. CO₂는 공기보다 1.5배 무거워 바닥·피트에 고이므로, 들어가기 전에 여러 높이에서 직접 측정해야 합니다.</li>
+  <li>약제량 표는 표면화재(전기실 등) 기준입니다. 종이·섬유 같은 심부화재는 다른 표를 씁니다.</li>
+  <li>계산값은 측정을 대신하지 않습니다. 작업 전 자동→수동 전환과 감시인 배치가 먼저입니다.</li>
+</ul>
+
+<h3>핵심 공식</h3>
+<pre class="g-f">약제량 Q = V × q + A × 5          (q: 체적별 kg/m³, 최저한도 적용)
+O₂ = 21 × V / (V + V_CO₂),   CO₂(%) = (21 − O₂) / 21 × 100
+환기시간 t = (V / kQ) × ln(처음 농도 / 목표 농도)</pre>
+<p class="g-src">출처: 국가화재안전기준 적용 소화설비론 236·240·241쪽, 작업환경공학 강의 농도 감소식, 화학공정안전 Box model 강의, 산업안전보건기준에 관한 규칙 제618조.</p>
+</article></div>
+</section>
+<section class="calc" id="s-lel" data-key="lel" hidden>
+<div class="pane" data-pane="calc"><div class="wrap">
+  <header>
+    <div class="eyebrow">소방 × 산업안전 · 계산기 2</div>
+    <h1>LEL 폭발방지 환기 계산기</h1>
+    <p class="lead">인화성 용제 사용량으로 증기 농도를 폭발하한계(LEL)의 25% 이하로 유지하는 환기량을 구하고, 같은 용제의 노출기준(TWA) 환기량과 나란히 비교합니다.</p>
+  </header>
+
+  <form class="panel" id="c2-form" novalidate>
+    <div class="panel-head">
+      <h2>사용하는 용제</h2>
+      <div class="btns">
+        <button type="button" id="c2-add">＋ 성분 추가</button>
+      </div>
+    </div>
+    <div class="comps" id="c2-comps"></div>
+  </form>
+
+  <div class="grid">
+    <div class="panel" id="c2-cond">
+      <h2>공통 조건</h2>
+      <div class="field"><label for="c2-t">실내 온도</label><div class="inp"><input id="c2-t" type="number" step="any"><span>℃</span></div><span class="hint">기체 1mol 부피: 21℃ 24.1L, 25℃ 24.45L, 그 밖은 24.1 × (273+t)/294</span></div>
+      <div class="field"><label for="c2-pt">공정(취급) 온도</label><div class="inp"><input id="c2-pt" type="number" step="any"><span>℃</span></div><span class="hint">120℃ 이상이면 온도 보정상수 B = 0.7</span></div>
+      <div class="field"><label for="c2-c">폭발 안전계수 C</label><div class="inp"><input id="c2-c" type="number" step="any" min="1"><span>LEL 25% → 4</span></div></div>
+      <div class="field"><span class="lbl" id="c2-modeLbl">혼합물 건강영향</span>
+        <div class="seg" role="radiogroup" aria-labelledby="c2-modeLbl">
+          <label><input type="radio" name="mode" value="add" checked><span>상가작용 (합)</span></label>
+          <label><input type="radio" name="mode" value="ind"><span>독립작용 (최대)</span></label>
+        </div>
+        <span class="hint">마취작용처럼 같은 장기에 작용하면 상가작용입니다.</span>
+      </div>
+      <div class="btns">
+        <button type="button" id="c2-ex1">예시 1: MEK 1종</button>
+        <button type="button" id="c2-ex2">예시 2: MEK + 톨루엔</button>
+        <button type="button" id="c2-reset">초기화</button>
+      </div>
+      <p class="example" id="c2-exNote"></p>
+    </div>
+
+    <div class="steps" aria-live="polite">
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 1</span><h3>폭발방지 환기량</h3></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c2-r-lel">–</span><span class="k">LEL 25% 이하 유지 (성분 합)</span></div>
+          <div class="metric"><span class="v" id="c2-r-lelh">–</span><span class="k">시간당</span></div>
+        </div>
+        <div class="tbl"><table id="c2-t-lel"></table></div>
+        <p class="note">성분별 환기량을 더하면 Σ(Cᵢ/LELᵢ) ≤ 25%가 되어, 르샤틀리에 혼합 LEL 기준과 같아집니다.</p>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 2</span><h3>노출기준(TWA) 환기량</h3><span class="pill" id="c2-r-mode">–</span></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c2-r-tlv">–</span><span class="k">작업자 건강 보호</span></div>
+          <div class="metric"><span class="v" id="c2-r-tlvh">–</span><span class="k">시간당</span></div>
+        </div>
+        <div class="tbl"><table id="c2-t-tlv"></table></div>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 3</span><h3>어느 기준으로 설계할까</h3></div>
+        <div class="bars" id="c2-bars"></div>
+        <p class="scale-note" id="c2-scaleNote"></p>
+        <div class="callout" id="c2-r-insight"></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c2-r-need">–</span><span class="k">필요 환기량 (둘 중 큰 값)</span></div>
+          <div class="metric"><span class="v" id="c2-r-pct">–</span><span class="k">그 환기량에서 증기 농도 (LEL 대비)</span></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="lower">
+    <section class="card">
+      <h3>계산 근거</h3>
+      <pre class="basis" id="c2-basis"></pre>
+      <div class="btns"><button type="button" id="c2-copy">계산 근거 복사</button></div>
+      <p class="src">완전 혼합을 가정한 전체환기 식입니다. 발생원 가까이는 평균보다 진하므로(Box model k = 0.1~0.5) 국소배기와 점화원 관리를 함께 해야 합니다.</p>
+    </section>
+    <section class="card">
+      <h3>관련 기준</h3>
+      <ul>
+        <li>산업안전보건기준에 관한 규칙 제230조(폭발위험이 있는 장소의 설정 및 관리) (추정)</li>
+        <li>같은 규칙 제232조(폭발 또는 화재 등의 예방): 인화성 증기가 폭발위험 농도에 이르지 않도록 통풍·환기 (추정)</li>
+        <li>고용노동부 화학물질 및 물리적 인자의 노출기준: 성분별 TWA</li>
+      </ul>
+      <p class="src">출처: 작업환경공학 강의(2024-7) 3.1.2 전체환기 4·5절, 예제 1·3. 물질 LEL·분자량·비중은 NIOSH Pocket Guide로 12종 모두 확인했고, TWA는 고용노동부 노출기준 고시(2018) 등으로 확인했습니다. 초산에틸 TWA 400ppm만 (추정)입니다. 실제 현장은 MSDS 값을 넣으세요.</p>
+    </section>
+    <section class="card">
+      <h3>사고 사례</h3>
+      <ul>
+        <li>2020년 이천 물류창고 신축공사 화재: 지하 우레탄 작업에서 생긴 유증기가 화기작업 불티와 만나 폭발·화재, 근로자 38명 사망</li>
+      </ul>
+      <p class="note">용제 작업과 화기작업을 같은 시간·공간에서 하지 않도록 작업을 나누고, 환기와 가스농도 측정을 먼저 하는 것이 핵심 대책으로 꼽혔습니다.</p>
+    </section>
+    <section class="card">
+      <h3>면접 질문</h3>
+      <details>
+        <summary>도장 작업과 용접 작업이 같은 공간에서 겹치면 어떻게 관리하겠습니까?</summary>
+        <ul>
+          <li>작업 일정을 분리하고, 불가피하면 화기작업 허가서로 통제</li>
+          <li>작업 전 가연성 가스 농도 측정(LEL 10% 미만 확인), 환기 가동</li>
+          <li>불티 비산방지포, 소화기 비치, 화재감시자 배치</li>
+          <li>용제 용기는 밀폐하고 작업장 밖에 보관</li>
+        </ul>
+      </details>
+      <details>
+        <summary>폭발 기준과 노출기준 중 무엇으로 환기량을 정합니까?</summary>
+        <p>둘 다 계산해서 큰 값을 씁니다. 이 계산기의 예시처럼 대부분은 노출기준 환기량이 수십~수백 배 커서, 작업자 건강을 지키면 폭발 농도에는 훨씬 못 미칩니다. 다만 사람이 없는 저장소·건조로처럼 노출기준이 적용되지 않는 곳은 LEL 기준이 설계값이 됩니다.</p>
+      </details>
+      <details>
+        <summary>왜 LEL의 25%로 관리합니까?</summary>
+        <p>환기가 고르지 않아 국소적으로 평균보다 진한 곳이 생기기 때문입니다. 평균을 LEL의 1/4로 두면 4배까지 고여도 폭발하한계에 닿지 않습니다. 120℃ 이상에서는 LEL이 낮아져 B = 0.7로 환기량을 더 늘립니다.</p>
+      </details>
+    </section>
+  </div>
+</div></div>
+<div class="pane" data-pane="guide" hidden><article class="guide" data-pfx="c2-"><div class="eyebrow">설명서 · LEL 폭발방지 환기</div><h2>LEL 폭발방지 환기 계산기 사용법</h2>
+<p class="g-lead">용제를 쓰는 작업장에서 (1) 증기가 폭발하지 않게 하는 환기량과 (2) 작업자 건강을 지키는 환기량을 같이 계산해, 어느 쪽으로 설계해야 하는지 보여 줍니다.</p>
+
+<h3>언제 쓰나요</h3>
+<ul>
+  <li>도장·세척·접착처럼 유기용제를 쓰는 공정의 환기 설비를 검토할 때</li>
+  <li>용제 사용량이 늘거나 다른 용제로 바뀌었을 때</li>
+  <li>작업환경측정 결과가 높게 나와 환기량이 충분한지 확인할 때</li>
+</ul>
+
+<h3>입력 칸 설명</h3>
+<div class="g-tbl"><table>
+  <thead><tr><th>칸</th><th>뜻</th><th>어디서 찾나요</th></tr></thead>
+  <tbody>
+    <tr><td>성분</td><td>목록 12종 중에서 고르면 값이 자동으로 들어갑니다. 없으면 "직접 입력"</td><td>MSDS 3번(구성성분)</td></tr>
+    <tr><td>사용량</td><td>한 시간에 쓰는 양. 쓴 만큼 모두 증발한다고 봅니다</td><td>하루 사용량 ÷ 작업시간</td></tr>
+    <tr><td>비중·분자량·LEL</td><td>L를 kg으로 바꾸고, 증기 부피와 폭발하한계를 계산하는 값</td><td>MSDS 9번(물리화학적 특성)</td></tr>
+    <tr><td>TWA</td><td>8시간 평균 노출기준(ppm)</td><td>MSDS 8번, 고용노동부 노출기준 고시</td></tr>
+    <tr><td>안전계수 K</td><td>공기가 덜 섞이는 만큼 환기량을 늘리는 배수</td><td>강의 예제는 4~7. 잘 안 섞이거나 독성이 강하면 크게</td></tr>
+    <tr><td>공정 온도</td><td>120℃ 이상이면 LEL이 낮아져 B = 0.7로 환기량을 늘립니다</td><td>건조로·가열 공정 온도</td></tr>
+    <tr><td>안전계수 C</td><td>LEL의 몇 분의 1로 관리할지. 25%면 4</td><td>보통 4</td></tr>
+    <tr><td>상가·독립작용</td><td>여러 성분이 같은 장기에 작용하면 환기량을 더하고(상가), 아니면 가장 큰 값만 씁니다(독립)</td><td>MSDS 11번(독성 정보)</td></tr>
+  </tbody>
+</table></div>
+
+<h3>결과 읽는 법</h3>
+<ol>
+  <li><b>STEP 1 폭발방지 환기량</b>은 증기 농도를 LEL의 25% 아래로 두는 양입니다. 성분별 값을 더하면 혼합물 LEL(르샤틀리에) 기준과 같아집니다.</li>
+  <li><b>STEP 2 노출기준 환기량</b>은 TWA를 넘지 않게 하는 양입니다.</li>
+  <li><b>STEP 3</b>은 두 값을 막대로 비교합니다. 차이가 크면 로그 눈금으로 바뀌니 숫자를 같이 보세요. 설계는 둘 중 큰 값으로 합니다.</li>
+</ol>
+
+<h3>예시로 따라 해 보기 (강의 예제 1)</h3>
+<ol class="g-steps">
+  <li>MEK 2L/h × 비중 0.805 = <b>1.61kg/h</b>, 톨루엔 2L/h × 0.866 = <b>1.732kg/h</b></li>
+  <li>MEK 노출기준 환기량 = 24.45 × 1.61 × 4 × 10⁶ / (72.1 × 200) = 10,919m³/h = <b>181.99m³/min</b></li>
+  <li>톨루엔 = 24.45 × 1.732 × 5 × 10⁶ / (92.13 × 50) = <b>766.08m³/min</b></li>
+  <li>둘 다 마취작용이라 상가작용이므로 더하면 <b>948.07m³/min</b> (강의 정답과 같음)</li>
+  <li>같은 조건의 폭발방지 환기량은 2.60 + 2.79 = <b>5.39m³/min</b>. 노출기준이 약 176배 큽니다.</li>
+</ol>
+<button type="button" class="g-try" data-try="ex2">이 예시로 계산해 보기</button>
+
+<h3>꼭 알아 둘 점</h3>
+<ul>
+  <li>사용량이 전부 증발한다고 보는 보수적인 계산입니다.</li>
+  <li>방 전체 평균 농도를 구하는 전체환기 식입니다. 발생원 바로 옆은 훨씬 진하므로 국소배기가 먼저이고, 점화원(방폭 전기기기, 정전기) 관리를 함께 해야 합니다.</li>
+  <li>사람이 없는 저장소·건조로는 노출기준이 아니라 LEL 기준이 설계값이 됩니다.</li>
+  <li>목록 값은 NIOSH 자료로 확인했지만, 실제 현장은 쓰는 제품의 MSDS 값을 넣으세요. 초산에틸 TWA는 (추정)입니다.</li>
+</ul>
+
+<h3>핵심 공식</h3>
+<pre class="g-f">폭발방지 Q(m³/h) = 24.1 × kg/h × C × 10² / (분자량 × LEL × B)
+노출기준 Q(m³/h) = 24.1 × kg/h × K × 10⁶ / (분자량 × TWA)
+24.1 = 21℃ 기체 1mol 부피(L), 25℃는 24.45.  m³/min = m³/h ÷ 60</pre>
+<p class="g-src">출처: 작업환경공학 강의(2024-7) 3.1.2 전체환기 4·5절, 예제 1·3. 물질값은 NIOSH Pocket Guide, 노출기준은 고용노동부 고시.</p>
+</article></div>
+</section>
+<section class="calc" id="s-ext" data-key="ext" hidden>
+<div class="pane" data-pane="calc"><div class="wrap">
+  <header>
+    <div class="eyebrow">소방 × 산업안전 · 계산기 3</div>
+    <h1>소화기·스프링클러 수원 계산기</h1>
+    <p class="lead">건물 용도와 바닥면적으로 필요한 소화기 능력단위와 개수를, 층수와 설치장소로 스프링클러 기준개수와 수원(저수량)을 계산합니다.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="c3-form" novalidate>
+      <h2>건물 조건</h2>
+      <div class="field"><label for="c3-use">용도</label><div class="inp"><select id="c3-use"></select></div></div>
+      <div class="row2">
+        <div class="field"><label for="c3-area">한 층 바닥면적</label><div class="inp"><input id="c3-area" type="number" step="any" min="0"><span>㎡</span></div></div>
+        <div class="field"><label for="c3-fl">지상 층수</label><div class="inp"><input id="c3-fl" type="number" step="1" min="1"><span>층</span></div></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="c3-fire"><span>주요구조부 내화구조 + 실내 마감 불연·준불연·난연재 (기준면적 2배)</span></label>
+
+      <h2>소화기</h2>
+      <div class="field"><label for="c3-unit">소화기 1개 능력단위</label><div class="inp"><input id="c3-unit" type="number" step="1" min="1"><span>단위</span></div><span class="hint">명판의 A급 능력단위. 예: 분말 3.3kg은 보통 A3</span></div>
+      <label class="chk"><input type="checkbox" id="c3-red"><span>옥내소화전·스프링클러·물분무등 설치 (유효범위 안 소형 소화기 2/3 감소)</span></label>
+
+      <h2>스프링클러 (폐쇄형)</h2>
+      <label class="chk" id="c3-w-spec"><input type="checkbox" id="c3-spec"><span>특수가연물을 저장·취급</span></label>
+      <label class="chk" id="c3-w-mart"><input type="checkbox" id="c3-mart"><span>슈퍼마켓·도매·소매시장 또는 그것이 있는 복합건축물</span></label>
+      <label class="chk" id="c3-w-h8"><input type="checkbox" id="c3-h8"><span>헤드 부착높이 8m 이상</span></label>
+      <label class="chk"><input type="checkbox" id="c3-sub"><span>지하가 또는 지하역사</span></label>
+      <div class="field"><label for="c3-heads">가장 많이 설치된 층의 헤드 수</label><div class="inp"><input id="c3-heads" type="number" step="1" min="0"><span>개</span></div><span class="hint">모르면 비워 두세요. 기준개수보다 적으면 이 값을 씁니다.</span></div>
+      <div class="btns">
+        <button type="button" id="c3-ex1">예시 1: 대형매장</button>
+        <button type="button" id="c3-ex2">예시 2: 공장</button>
+        <button type="button" id="c3-reset">초기화</button>
+      </div>
+      <p class="example" id="c3-exNote"></p>
+    </form>
+
+    <div class="steps" aria-live="polite">
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 1</span><h3>소화기 능력단위</h3><span class="pill" id="c3-r-redpill">–</span></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c3-r-units">–</span><span class="k">한 층에 필요한 능력단위</span></div>
+          <div class="metric"><span class="v" id="c3-r-cnt">–</span><span class="k">한 층 소화기 개수</span></div>
+          <div class="metric"><span class="v" id="c3-r-total">–</span><span class="k">건물 전체</span></div>
+        </div>
+        <div class="ext-row" id="c3-r-icons" aria-hidden="true"></div>
+        <p class="note" id="c3-r-ext-note"></p>
+        <div class="tbl"><table id="c3-t16"></table></div>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 2</span><h3>스프링클러 수원</h3></div>
+        <div class="tank">
+          <svg id="c3-tank" viewBox="0 0 96 120" role="img" aria-label="수원 저수량 그림"></svg>
+          <div class="big">
+            <div class="metric"><span class="v" id="c3-r-q">–</span><span class="k">필요 수원 (저수량)</span></div>
+            <div class="metric"><span class="v" id="c3-r-n">–</span><span class="k">기준개수 N</span></div>
+            <div class="metric"><span class="v" id="c3-r-min">–</span><span class="k">방수 시간</span></div>
+          </div>
+        </div>
+        <div class="formula" id="c3-r-formula"></div>
+        <div class="callout water" id="c3-r-sp-note"></div>
+        <div class="tbl"><table id="c3-t47"></table></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="lower">
+    <section class="card">
+      <h3>계산 근거</h3>
+      <pre class="basis" id="c3-basis"></pre>
+      <div class="btns"><button type="button" id="c3-copy">계산 근거 복사</button></div>
+      <p class="src">소화기는 능력단위와 함께 보행거리(소형 20m, 대형 30m 이내)마다 배치해야 하므로, 실제 개수는 평면도로 다시 확인합니다.</p>
+    </section>
+    <section class="card">
+      <h3>관련 기준</h3>
+      <ul>
+        <li>소화기구 및 자동소화장치의 화재안전기술기준(NFTC 101): 능력단위 표, 감소·면제 기준</li>
+        <li>스프링클러설비의 화재안전기술기준(NFTC 103): 폐쇄형 헤드 기준개수, 수원 1.6·3.2·4.8m³</li>
+        <li>소방시설 설치 및 관리에 관한 법률: 작동점검·종합점검</li>
+      </ul>
+      <p class="src">출처: 국가화재안전기준 적용 소화설비론 표 1.6(43쪽), 1.4.4 감소기준·표 1.7(43~44쪽), 표 4.7과 수원식(146쪽).</p>
+    </section>
+    <section class="card">
+      <h3>사고 사례</h3>
+      <ul>
+        <li>2021년 쿠팡 덕평 물류센터 화재: 지하 2층에서 시작한 불이 6일 동안 이어졌고, 진압 중 소방관 1명이 숨졌습니다.</li>
+      </ul>
+      <p class="note">초기에 스프링클러 작동이 늦어진 점이 문제로 지적됐습니다. 설비가 있어도 수신반 조작과 유지관리가 잘못되면 쓸모가 없다는 사례입니다.</p>
+    </section>
+    <section class="card">
+      <h3>면접 질문</h3>
+      <details>
+        <summary>소방시설 작동점검과 종합점검의 차이는 무엇입니까?</summary>
+        <p>작동점검은 설비를 인위적으로 조작해 정상 작동하는지 보는 점검이고, 종합점검은 작동점검을 포함해 설비의 주요 구성부품이 화재안전기준에 맞게 설치·유지되는지까지 보는 점검입니다.</p>
+      </details>
+      <details>
+        <summary>스프링클러가 있는 공장에 소화기를 줄여도 됩니까?</summary>
+        <p>유효범위 안에서는 소형 소화기를 2/3까지 줄일 수 있습니다. 다만 11층 이상 부분과 근린생활·판매·숙박·의료·아파트·업무시설 등은 줄일 수 없습니다. 이 계산기의 감소 체크도 그 용도에서는 적용되지 않습니다.</p>
+      </details>
+      <details>
+        <summary>수원 1.6m³는 어떻게 나온 숫자입니까?</summary>
+        <p>헤드 1개가 80L/min으로 20분 동안 방수하는 양입니다(80 × 20 = 1,600L). 30~49층은 40분(3.2m³), 50층 이상은 60분(4.8m³)으로 늘어납니다.</p>
+      </details>
+    </section>
+  </div>
+</div></div>
+<div class="pane" data-pane="guide" hidden><article class="guide" data-pfx="c3-"><div class="eyebrow">설명서 · 소화기·스프링클러 수원</div><h2>소화기·스프링클러 수원 계산기 사용법</h2>
+<p class="g-lead">건물 용도와 바닥면적으로 소화기가 몇 개 필요한지, 층수와 설치장소로 스프링클러 물탱크(수원)가 얼마나 커야 하는지 계산합니다.</p>
+
+<h3>언제 쓰나요</h3>
+<ul>
+  <li>소방안전관리자로 자체점검을 할 때 소화기 수량이 맞는지 볼 때</li>
+  <li>공장 증축·용도변경으로 소방시설이 바뀔 때</li>
+  <li>소방안전관리자·소방설비기사 시험 계산 문제를 풀 때</li>
+</ul>
+
+<h3>입력 칸 설명</h3>
+<div class="g-tbl"><table>
+  <thead><tr><th>칸</th><th>뜻</th><th>어디서 찾나요</th></tr></thead>
+  <tbody>
+    <tr><td>용도</td><td>소방대상물 구분. 용도마다 소화기 1단위가 담당하는 면적이 다릅니다</td><td>건축물대장 용도</td></tr>
+    <tr><td>한 층 바닥면적</td><td>소화기는 층마다 계산합니다</td><td>건축물대장, 평면도</td></tr>
+    <tr><td>지상 층수</td><td>11층 이상이면 스프링클러 기준개수 30, 30층 이상이면 수원이 늘어납니다</td><td>건축물대장</td></tr>
+    <tr><td>내화구조 + 불연 마감</td><td>불에 강한 건물이면 1단위가 담당하는 면적이 2배가 됩니다</td><td>건축물대장 구조, 마감재 확인</td></tr>
+    <tr><td>소화기 1개 능력단위</td><td>소화기 명판의 A급 숫자</td><td>명판 "A3 B5 C"면 3</td></tr>
+    <tr><td>2/3 감소</td><td>옥내소화전·스프링클러 등이 있으면 소형 소화기를 줄일 수 있습니다. 일부 용도는 불가</td><td>소방시설 현황</td></tr>
+    <tr><td>스프링클러 칸들</td><td>표 4.7의 기준개수를 고르는 조건입니다. 용도에 따라 필요한 칸만 보입니다</td><td>현장 조건</td></tr>
+  </tbody>
+</table></div>
+
+<h3>결과 읽는 법</h3>
+<ol>
+  <li><b>STEP 1</b>: 바닥면적 ÷ 기준면적을 올림한 값이 한 층에 필요한 능력단위입니다. 그것을 소화기 1개의 단위로 나눠 올림하면 개수가 나옵니다. 아래 표에서 적용한 줄이 강조됩니다.</li>
+  <li><b>STEP 2</b>: 기준개수 N(설치 헤드가 더 적으면 그 수) × 1.6m³가 수원입니다. 헤드 1개가 80L/min으로 20분 뿌리는 양입니다.</li>
+</ol>
+
+<h3>예시로 따라 해 보기 (대형마트)</h3>
+<ol class="g-steps">
+  <li>판매시설은 100㎡마다 1단위, 내화구조 + 불연 마감이라 <b>200㎡마다 1단위</b>입니다.</li>
+  <li>한 층 2,000㎡ ÷ 200 = <b>10단위</b>, 3단위 소화기로는 10 ÷ 3 → 올림 <b>4개</b>입니다.</li>
+  <li>5개 층이므로 건물 전체 <b>20개</b>입니다.</li>
+  <li>슈퍼마켓·소매시장이 있는 판매시설이라 스프링클러 기준개수는 <b>30개</b>입니다.</li>
+  <li>수원 = 30 × 1.6 = <b>48m³</b> (가로·세로 약 4.9m, 깊이 2m 물탱크)</li>
+</ol>
+<button type="button" class="g-try" data-try="ex1">이 예시로 계산해 보기</button>
+
+<h3>꼭 알아 둘 점</h3>
+<ul>
+  <li>소화기는 능력단위뿐 아니라 보행거리(소형 20m, 대형 30m) 안에 하나씩 있어야 합니다. 실제 개수는 평면도로 다시 확인하세요.</li>
+  <li>폐쇄형 헤드 기준입니다. 개방형 헤드는 설치 헤드 수로 계산합니다.</li>
+  <li>11층 이상 부분과 근린생활·판매·숙박·의료·아파트·업무시설 등은 2/3 감소를 쓸 수 없습니다.</li>
+</ul>
+
+<h3>핵심 공식</h3>
+<pre class="g-f">능력단위 = 바닥면적 ÷ 기준면적 (올림)
+소화기 개수 = 능력단위 ÷ 소화기 1개 단위 (올림)
+수원 Q = N × 80 L/min × 20 min = N × 1.6 m³   (30~49층 3.2, 50층 이상 4.8)</pre>
+<p class="g-src">출처: 국가화재안전기준 적용 소화설비론 표 1.6(43쪽), 1.4.4 감소기준·표 1.7(43~44쪽), 표 4.7과 수원식(146쪽).</p>
+</article></div>
+</section>
+<section class="calc" id="s-smoke" data-key="smoke" hidden>
+<div class="pane" data-pane="calc"><div class="wrap">
+  <header>
+    <div class="eyebrow">소방 × 산업안전 · 계산기 4</div>
+    <h1>제연설비 배출량 계산기</h1>
+    <p class="lead">제연구역의 면적과 제연경계 수직거리로 NFTC 501 배출량을 구하고, 배출 덕트 직경·강판 두께, 공기유입구 크기, 배출기 동력까지 이어서 계산합니다.</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel" id="c4-form" novalidate>
+      <h2>제연구역 조건</h2>
+      <div class="field"><label for="c4-kind">배출 방식</label><div class="inp"><select id="c4-kind">
+        <option value="room">거실 배출</option>
+        <option value="path">통로 배출 (거실 50㎡ 미만)</option>
+      </select></div></div>
+      <div class="field"><label for="c4-area">바닥면적</label><div class="inp"><input id="c4-area" type="number" step="any" min="0"><span>㎡</span></div><span class="hint">제연구역 하나는 1,000㎡ 이내, 직경 60m 원 안이어야 합니다.</span></div>
+      <div class="field" id="c4-w-circle"><label for="c4-circle">직경 40m 원 안에 들어가나요?</label><div class="inp"><select id="c4-circle">
+        <option value="in">들어간다</option><option value="out">넘는다</option>
+      </select></div><span class="hint">400㎡ 이상 거실에서만 씁니다.</span></div>
+      <div class="field" id="c4-w-walk"><label for="c4-walk">통로 보행중심선 길이</label><div class="inp"><input id="c4-walk" type="number" step="any" min="0"><span>m</span></div><span class="hint">40m 이하 / 40m 초과 60m 이하</span></div>
+      <div class="field"><label for="c4-bound">구획 방법</label><div class="inp"><select id="c4-bound">
+        <option value="wall">벽으로 구획</option><option value="curtain">제연경계(보·제연경계벽)로 구획</option>
+      </select></div></div>
+      <div class="field" id="c4-w-hv"><label for="c4-hv">제연경계 수직거리</label><div class="inp"><input id="c4-hv" type="number" step="any" min="0"><span>m</span></div><span class="hint">제연경계 하단에서 바닥까지의 거리</span></div>
+
+      <h2>배출기 (선택)</h2>
+      <div class="row2">
+        <div class="field"><label for="c4-p">전압</label><div class="inp"><input id="c4-p" type="number" step="any" min="0"><span>mmAq</span></div></div>
+        <div class="field"><label for="c4-eta">효율</label><div class="inp"><input id="c4-eta" type="number" step="any" min="0.05" max="1"><span>0~1</span></div></div>
+      </div>
+      <div class="field"><label for="c4-alpha">여유율</label><div class="inp"><input id="c4-alpha" type="number" step="any" min="1"><span>배</span></div><span class="hint">설계 전압·효율·여유율은 덕트 설계와 팬 성능표 값을 넣으세요. 기본값은 예시입니다.</span></div>
+      <div class="btns">
+        <button type="button" id="c4-ex1">예시 1: 큰 거실</button>
+        <button type="button" id="c4-ex2">예시 2: 작은 거실</button>
+        <button type="button" id="c4-reset">초기화</button>
+      </div>
+      <p class="example" id="c4-exNote"></p>
+    </form>
+
+    <div class="steps" aria-live="polite">
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 1</span><h3>필요 배출량</h3><span class="pill" id="c4-r-zone">–</span></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c4-r-qh">–</span><span class="k">배출량 (이상)</span></div>
+          <div class="metric"><span class="v" id="c4-r-qm">–</span><span class="k">분당</span></div>
+          <div class="metric"><span class="v" id="c4-r-qs">–</span><span class="k">초당</span></div>
+        </div>
+        <p class="note" id="c4-r-rule"></p>
+        <div class="tbl"><table id="c4-t-v"></table></div>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 2</span><h3>배출 덕트 (원형)</h3></div>
+        <div class="ducts" id="c4-ducts"></div>
+        <p class="note">D = √(4Q / πV). 풍속 한도가 작을수록 덕트가 굵어집니다. 강판 두께는 원형 덕트 직경(각형은 긴 변) 기준입니다.</p>
+      </section>
+
+      <section class="step">
+        <div class="step-head"><span class="step-no">STEP 3</span><h3>공기유입구와 배출기</h3></div>
+        <div class="big">
+          <div class="metric"><span class="v" id="c4-r-inlet">–</span><span class="k">공기유입구 면적 (35㎠ × m³/min)</span></div>
+          <div class="metric"><span class="v" id="c4-r-vin">–</span><span class="k">그때 유입 풍속 (5m/s 이하)</span></div>
+          <div class="metric"><span class="v" id="c4-r-kw">–</span><span class="k">배출기 소요동력</span></div>
+        </div>
+        <div class="callout" id="c4-r-insight"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="lower">
+    <section class="card">
+      <h3>계산 근거</h3>
+      <pre class="basis" id="c4-basis"></pre>
+      <div class="btns"><button type="button" id="c4-copy">계산 근거 복사</button></div>
+      <p class="src">400㎡ 미만 거실을 다른 거실의 피난 경로로 쓰는 경우(경유거실), 급기 방식, 부속실 제연(NFTC 501A)은 이 계산기에서 다루지 않습니다.</p>
+    </section>
+    <section class="card">
+      <h3>관련 기준</h3>
+      <ul>
+        <li>제연설비의 화재안전기술기준(NFTC 501): 배출량(2.3), 풍도 풍속(2.6), 공기유입구(2.5), 비상전원 20분 이상</li>
+        <li>특별피난계단의 계단실 및 부속실 제연설비(NFTC 501A)</li>
+      </ul>
+      <p class="src">출처: NFTC 501(2024.10.1. 시행) 2.1·2.3·2.5·2.6·2.7·2.9, 표 2.3.1.2·2.3.2.1·2.3.2.2·2.6.2.1. 덕트 직경·동력식은 작업환경공학 강의(2024-7·8) 국소환기·송풍기.</p>
+    </section>
+    <section class="card">
+      <h3>사고 사례</h3>
+      <ul>
+        <li>2017년 제천 스포츠센터 화재: 1층 필로티 주차장에서 난 불의 연기가 계단으로 번져 29명 사망, 2층 여성 사우나에서 피해가 컸습니다.</li>
+        <li>2018년 밀양 세종병원 화재: 사망자 40명 이상, 대부분 연기 흡입이 원인이었습니다.</li>
+      </ul>
+      <p class="note">두 사고 모두 불보다 연기가 사람을 해쳤고, 연기를 막는 구획·배연이 제대로 되지 않았던 점이 지적됐습니다.</p>
+    </section>
+    <section class="card">
+      <h3>면접 질문</h3>
+      <details>
+        <summary>화재 사망자 대부분이 불이 아니라 연기 때문인 이유와 대책을 말해 보세요.</summary>
+        <ul>
+          <li>연기는 사람이 걷는 속도보다 빨리 위로 퍼지고, CO 같은 유독가스와 산소 부족으로 몇 분 안에 의식을 잃게 합니다.</li>
+          <li>대책은 제연설비로 연기를 빼내고 공기를 넣어 피난로를 지키는 것, 방화문·제연경계를 닫힌 상태로 유지하는 것, 피난 훈련입니다.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>제연경계 수직거리가 길수록 배출량이 늘어나는 이유는?</summary>
+        <p>수직거리가 길면 연기층이 바닥에 더 가까이 내려올 수 있어, 피난에 필요한 맑은 공기층을 지키려면 더 많이 빼내야 하기 때문입니다.</p>
+      </details>
+      <details>
+        <summary>제연 덕트 계산이 국소배기 덕트 계산과 같은 점은?</summary>
+        <p>둘 다 Q = A × V로 풍량과 풍속에서 단면적을 구하고, 압력손실과 효율로 송풍기 동력을 정합니다. 다른 점은 제연은 화재 시 고온 연기를 견디는 재질과 비상전원이 필요하다는 것입니다.</p>
+      </details>
+    </section>
+  </div>
+</div></div>
+<div class="pane" data-pane="guide" hidden><article class="guide" data-pfx="c4-"><div class="eyebrow">설명서 · 제연설비 배출량</div><h2>제연설비 배출량 계산기 사용법</h2>
+<p class="g-lead">불이 났을 때 연기를 빼내야 하는 양(배출량)을 NFTC 501로 구하고, 그 양을 옮길 덕트 굵기, 바깥 공기가 들어올 구멍 크기, 배출기 동력까지 이어서 계산합니다.</p>
+
+<h3>언제 쓰나요</h3>
+<ul>
+  <li>판매시설·지하층·무창층처럼 제연설비가 있는 건물을 점검할 때</li>
+  <li>제연설비 성능시험에서 측정한 풍량이 기준을 넘는지 비교할 때</li>
+  <li>국소배기 덕트 계산을 소방 설비로 넓혀 설명할 때</li>
+</ul>
+
+<h3>입력 칸 설명</h3>
+<div class="g-tbl"><table>
+  <thead><tr><th>칸</th><th>뜻</th><th>어디서 찾나요</th></tr></thead>
+  <tbody>
+    <tr><td>배출 방식</td><td>거실에서 직접 빼는지, 50㎡ 미만 거실을 통로에서 빼는지</td><td>제연설비 설계도</td></tr>
+    <tr><td>바닥면적</td><td>제연구역 하나의 면적. 1,000㎡를 넘으면 구역을 나눠야 합니다</td><td>평면도</td></tr>
+    <tr><td>직경 40m 원</td><td>400㎡ 이상 거실이 지름 40m 원 안에 들어가는지</td><td>평면도에 원을 그려 확인</td></tr>
+    <tr><td>구획 방법</td><td>벽으로 막혔는지, 천장에서 내려온 보·제연경계로 나뉘었는지</td><td>현장 확인</td></tr>
+    <tr><td>수직거리</td><td>제연경계 아래 끝에서 바닥까지 거리. 길수록 배출량이 늘어납니다</td><td>실측</td></tr>
+    <tr><td>보행중심선 길이</td><td>통로배출 방식에서 통로 가운데를 따라 잰 길이</td><td>평면도</td></tr>
+    <tr><td>전압·효율·여유율</td><td>배출기 동력 계산용(선택). 기본값은 예시입니다</td><td>팬 성능표, 덕트 압력손실 계산서</td></tr>
+  </tbody>
+</table></div>
+
+<h3>결과 읽는 법</h3>
+<ol>
+  <li><b>STEP 1 배출량</b>은 NFTC 501이 정한 최소값입니다. 수직거리 표에서 적용한 칸이 강조됩니다.</li>
+  <li><b>STEP 2 덕트</b>는 흡입측 15m/s, 배출측 20m/s 풍속 한도에서 필요한 원형 덕트 직경과 강판 두께입니다.</li>
+  <li><b>STEP 3</b>은 공기유입구 면적(배출량 1m³/min당 35㎠)과 그때 유입 풍속, 배출기 소요동력입니다.</li>
+</ol>
+
+<h3>예시로 따라 해 보기 (큰 거실)</h3>
+<ol class="g-steps">
+  <li>600㎡ 거실, 40m 원 안, 제연경계 수직거리 2.2m → 표 2.3.2.1의 2~2.5m 줄 = <b>45,000m³/h</b></li>
+  <li>초당으로 바꾸면 45,000 ÷ 3,600 = <b>12.5m³/s</b></li>
+  <li>흡입측 D = √(4 × 12.5 / (π × 15)) = 약 <b>1,030mm</b> → 1,500mm 이하라 강판 <b>0.8mm</b></li>
+  <li>공기유입구 = 750m³/min × 35㎠ = 26,250㎠ = <b>2.63m²</b>, 유입 풍속 약 4.76m/s로 5m/s 이하</li>
+  <li>전압 60mmAq, 효율 0.6, 여유율 1.2면 동력 = 750 × 60 / (6120 × 0.6) × 1.2 = <b>14.7kW</b></li>
+</ol>
+<button type="button" class="g-try" data-try="ex1">이 예시로 계산해 보기</button>
+
+<h3>꼭 알아 둘 점</h3>
+<ul>
+  <li>경유거실(다른 거실의 피난 경로가 되는 거실), 급기 방식, 계단실·부속실 제연(NFTC 501A)은 다루지 않습니다.</li>
+  <li>현장 덕트는 각형이 많습니다. 각형은 긴 변 길이로 강판 두께를 봅니다.</li>
+  <li>배출기 전압은 덕트 길이·꺾임으로 생기는 압력손실을 따로 계산해야 정확합니다.</li>
+  <li>비상전원은 20분 이상 배출기를 돌릴 수 있어야 합니다.</li>
+</ul>
+
+<h3>핵심 공식</h3>
+<pre class="g-f">400㎡ 미만 거실: Q = 바닥면적 × 1 m³/min × 60  (최저 5,000 m³/h)
+덕트 직경 D = √(4Q / πV)
+공기유입구 = Q(m³/min) × 35 ㎠,   동력 kW = Q × P / (6120 × η) × α</pre>
+<p class="g-src">출처: NFTC 501(2024.10.1. 시행) 2.1·2.3·2.5·2.6·2.7·2.9와 표 2.3.1.2·2.3.2.1·2.3.2.2·2.6.2.1, 작업환경공학 강의(2024-7·8) 국소환기·송풍기.</p>
+</article></div>
+</section>
+</main>
+
+<script>
+/* CO₂ 소화설비 질식 */
+
+(function(){
+  var ids=["w","d","h","a","t","q","k"];
+  var EX={w:10,d:8,h:4,a:0,t:20,q:50,k:0.5};
+  var $=function(id){return document.getElementById("c1-"+id)};
+  var fmt=function(x,n){return isFinite(x)?x.toLocaleString("ko-KR",{maximumFractionDigits:n,minimumFractionDigits:n}):"–"};
+
+  // NFTC 106 표면화재 체적당 약제량 (소화설비론 표 7.3)
+  function agentRate(V){
+    if(V<45) return {q:1.00,min:45};
+    if(V<150) return {q:0.90,min:45};
+    if(V<1450) return {q:0.80,min:135};
+    return {q:0.75,min:1125};
+  }
+
+  function compute(v){
+    var V=v.w*v.d*v.h;
+    var r=agentRate(V);
+    var base=V*r.q, open=v.a*5;
+    var agent=Math.max(base,r.min)+open;
+    var sv=22.4/44*(273+v.t)/273;              // CO2 비체적 m3/kg
+    var gas=agent*sv;
+    var co2=gas/(V+gas)*100;                    // CO2(%) = (21-O2)/21*100
+    var o2=21*V/(V+gas);                        // O2 = 21V/(V+Vco2)
+    var Qe=v.k*v.q;                             // 유효 환기량 Q' = kQ
+    var tau=V/Qe;                               // min
+    var tO2=o2>=18?0:tau*Math.log((21-o2)/3);
+    var tCO2=co2<1.5?0:tau*Math.log(co2/1.5);
+    var t=Math.max(tO2,tCO2);
+    var ideal=t*v.k;
+    var ach=v.q*60/V;
+    return {V:V,r:r,base:base,open:open,agent:agent,sv:sv,gas:gas,co2:co2,o2:o2,tau:tau,tO2:tO2,tCO2:tCO2,t:t,ideal:ideal,ach:ach};
+  }
+
+  function read(){
+    var v={},ok=true;
+    ids.forEach(function(id){var x=parseFloat($(id).value);v[id]=x;if(!isFinite(x))ok=false;});
+    if(ok&&(v.w<=0||v.d<=0||v.h<=0||v.q<=0||v.k<=0||v.k>1||v.a<0)) ok=false;
+    return ok?v:null;
+  }
+
+  function status(o2){
+    if(o2<10) return ["danger","치명 · 산소 10% 미만"];
+    if(o2<16) return ["danger","위험 · 산소 16% 미만"];
+    if(o2<18) return ["warn","산소결핍 · 18% 미만"];
+    return ["ok","적정"];
+  }
+
+  function chart(res){
+    var svg=$("chart"),W=640,H=260,L=44,R=16,T=14,B=36;
+    var tMax=Math.max(res.t*1.25,5);
+    var yMax=Math.max(22,Math.ceil(res.co2/5)*5);
+    var x=function(t){return L+(W-L-R)*t/tMax};
+    var y=function(c){return T+(H-T-B)*(1-c/yMax)};
+    var s="";
+    var step=yMax>40?10:5;
+    for(var g=0;g<=yMax;g+=step){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(g)+'" y2="'+y(g)+'" stroke="var(--line)" stroke-width="1"/>';
+      s+='<text x="'+(L-8)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--f-num)">'+g+'</text>';}
+    var xt=niceStep(tMax);
+    for(var tt=0;tt<=tMax+1e-9;tt+=xt){s+='<text x="'+x(tt)+'" y="'+(H-B+16)+'" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-num)">'+Math.round(tt)+'</text>';}
+    s+='<text x="'+(W-R)+'" y="'+(H-4)+'" text-anchor="end" font-size="11" fill="var(--muted)">경과 시간 (분)</text>';
+    [[18,"O₂ 18%"],[1.5,"CO₂ 1.5%"]].forEach(function(b){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y(b[0])+'" y2="'+y(b[0])+'" stroke="var(--muted)" stroke-dasharray="4 4"/>'+
+      '<text x="'+(W-R-2)+'" y="'+(y(b[0])-5)+'" text-anchor="end" font-size="11" fill="var(--muted)">'+b[1]+'</text>';});
+    var po="",pc="",n=80;
+    for(var i=0;i<=n;i++){var t=tMax*i/n,f=Math.exp(-t/res.tau);
+      po+=(i?"L":"M")+x(t).toFixed(1)+","+y(21-(21-res.o2)*f).toFixed(1);
+      pc+=(i?"L":"M")+x(t).toFixed(1)+","+y(res.co2*f).toFixed(1);}
+    s+='<path d="'+po+'" fill="none" stroke="var(--o2)" stroke-width="2.5"/>';
+    s+='<path d="'+pc+'" fill="none" stroke="var(--co2)" stroke-width="2.5"/>';
+    if(res.t>0){s+='<line x1="'+x(res.t)+'" x2="'+x(res.t)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink)" stroke-width="1"/>'+
+      '<circle cx="'+x(res.t)+'" cy="'+y(1.5)+'" r="4" fill="var(--co2)"/>'+
+      '<text x="'+(x(res.t)+6)+'" y="'+(T+12)+'" font-size="12" font-weight="700" fill="var(--ink)">재진입 '+fmt(res.t,0)+'분</text>';}
+    svg.innerHTML=s;
+  }
+  function niceStep(m){var raw=m/6,p=Math.pow(10,Math.floor(Math.log10(raw))),c=[1,2,5,10];for(var i=0;i<c.length;i++){if(c[i]*p>=raw)return c[i]*p;}return 10*p;}
+
+  function render(){
+    var v=read();
+    if(!v){["r-agent","r-vol","r-gas","r-o2","r-co2","r-time","r-ideal","r-ach"].forEach(function(id){$(id).textContent="–"});
+      $("r-pill").className="pill";$("r-pill").textContent="값을 모두 입력하세요";
+      $("r-insight").textContent="가로·세로·높이, 배출 풍량은 0보다 커야 하고 k는 0.05~1 사이여야 합니다.";
+      $("basis").textContent="";$("chart").innerHTML="";$("r-agent-note").textContent="";return;}
+    var r=compute(v);
+    $("r-agent").innerHTML=fmt(r.agent,0)+"<small>kg</small>";
+    $("r-vol").innerHTML=fmt(r.V,0)+"<small>m³</small>";
+    $("r-gas").innerHTML=fmt(r.gas,0)+"<small>m³</small>";
+    var minUsed=r.base<r.r.min;
+    $("r-agent-note").textContent="체적 "+fmt(r.V,0)+"m³ 구간은 1m³당 "+r.r.q.toFixed(2)+"kg"+(minUsed?", 계산값이 최저한도 "+r.r.min+"kg보다 작아 최저한도를 적용했습니다":"(최저한도 "+r.r.min+"kg)")+(r.open>0?". 개구부 가산 "+fmt(r.open,0)+"kg 포함.":".");
+    $("r-o2").innerHTML=fmt(r.o2,1)+"<small>%</small>";
+    $("r-co2").innerHTML=fmt(r.co2,1)+"<small>%</small>";
+    var st=status(r.o2);$("r-pill").className="pill "+st[0];$("r-pill").textContent=st[1];
+    $("g-mark").style.left=Math.min(100,Math.max(0,r.o2/21*100))+"%";
+    $("g-mark").textContent="▼ "+fmt(r.o2,1)+"%";
+    $("r-time").innerHTML=fmt(r.t,0)+"<small>분</small>";
+    $("r-ideal").innerHTML=fmt(r.ideal,0)+"<small>분</small>";
+    $("r-ach").innerHTML=fmt(r.ach,1)+"<small>회/h</small>";
+    var lim=r.tCO2>=r.tO2?"CO₂":"산소";
+    $("r-insight").textContent= r.t===0 ? "방출 직후에도 기준을 만족합니다. 그래도 들어가기 전에 반드시 측정하세요." :
+      "산소는 "+fmt(r.tO2,0)+"분이면 18%로 돌아오지만 CO₂가 1.5% 아래로 떨어지려면 "+fmt(r.tCO2,0)+"분이 걸립니다. 재진입 시간은 "+lim+" 기준으로 정해집니다."+(lim==="CO₂"?" 산소 측정만 하고 들어가면 안 되는 이유입니다.":"");
+    chart(r);
+    $("basis").textContent=
+      "① 체적 V = "+v.w+" × "+v.d+" × "+v.h+" = "+fmt(r.V,1)+" m³\n"+
+      "② 약제량 Q = V × q + A × 5\n   = "+fmt(r.V,1)+" × "+r.r.q.toFixed(2)+(minUsed?" → 최저한도 "+r.r.min:"")+" + "+v.a+" × 5 = "+fmt(r.agent,1)+" kg\n"+
+      "③ CO₂ 비체적 = 22.4/44 × (273+"+v.t+")/273 = "+r.sv.toFixed(4)+" m³/kg\n   CO₂ 부피 = "+fmt(r.agent,1)+" × "+r.sv.toFixed(4)+" = "+fmt(r.gas,1)+" m³\n"+
+      "④ O₂ = 21 × V/(V+Vco₂) = "+fmt(r.o2,2)+" %\n   CO₂ = (21−O₂)/21 × 100 = "+fmt(r.co2,2)+" %\n"+
+      "⑤ 유효 환기량 Q' = k × Q = "+v.k+" × "+v.q+" = "+fmt(v.k*v.q,1)+" m³/min\n"+
+      "   O₂ 18% 회복 t = (V/Q')·ln((21−O₂)/3) = "+fmt(r.tO2,1)+" 분\n"+
+      "   CO₂ 1.5% 도달 t = (V/Q')·ln(CO₂/1.5) = "+fmt(r.tCO2,1)+" 분\n"+
+      "⑥ 재진입 가능 시간 = 둘 중 긴 값 = "+fmt(r.t,1)+" 분";
+    try{localStorage.setItem("co2calc",JSON.stringify(v));}catch(e){}
+  }
+
+  function fill(v){ids.forEach(function(id){$(id).value=v[id]});render();}
+  $("ex").addEventListener("click",function(){fill(EX)});
+  $("reset").addEventListener("click",function(){ids.forEach(function(id){$(id).value=""});try{localStorage.removeItem("co2calc")}catch(e){}render();});
+  $("form").addEventListener("input",render);
+  $("form").addEventListener("submit",function(e){e.preventDefault()});
+  $("copy").addEventListener("click",function(){
+    var txt=$("basis").textContent,btn=this;
+    var done=function(){btn.textContent="복사했습니다";setTimeout(function(){btn.textContent="계산 근거 복사"},1500)};
+    var sel=function(){var r=document.createRange();r.selectNodeContents($("basis"));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="선택했습니다. 복사하세요";};
+    try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}
+  });
+  var saved=null;try{saved=JSON.parse(localStorage.getItem("co2calc")||"null")}catch(e){}
+  fill(saved||EX);
+})();
+
+/* LEL 폭발방지 환기 */
+
+(function(){
+  // 물질 기본값: 분자량, 비중, LEL(%), TWA(ppm). MEK·톨루엔·메탄올의 분자량·비중·TWA는 작업환경공학 강의 예제 값.
+  var DB={
+    toluene:{n:"톨루엔",mw:92.13,sg:0.866,lel:1.1,tlv:50},
+    xylene:{n:"크실렌 (m-자일렌)",mw:106.16,sg:0.86,lel:1.1,tlv:100},
+    ipa:{n:"이소프로필알코올 (IPA)",mw:60.1,sg:0.785,lel:2.0,tlv:200},
+    acetone:{n:"아세톤",mw:58.08,sg:0.791,lel:2.5,tlv:500},
+    methanol:{n:"메탄올",mw:32.04,sg:0.792,lel:6.0,tlv:200},
+    ethanol:{n:"에탄올",mw:46.07,sg:0.789,lel:3.3,tlv:1000},
+    mek:{n:"메틸에틸케톤 (MEK)",hot:1,mw:72.1,sg:0.805,lel:1.4,tlv:200},
+    mibk:{n:"메틸이소부틸케톤 (MIBK)",hot:1,mw:100.16,sg:0.80,lel:1.2,tlv:50},
+    ea:{n:"초산에틸 (TWA 추정)",mw:88.11,sg:0.902,lel:2.0,tlv:400},
+    ba:{n:"초산부틸 (n-)",mw:116.16,sg:0.88,lel:1.7,tlv:150},
+    hexane:{n:"노말헥산",mw:86.18,sg:0.659,lel:1.1,tlv:50},
+    dmf:{n:"디메틸포름아미드 (DMF)",hot:1,mw:73.09,sg:0.944,lel:2.2,tlv:10},
+    custom:{n:"직접 입력",mw:"",sg:"",lel:"",tlv:""}
+  };
+  var FIELDS=[["use","사용량","L/h"],["sg","비중",""],["mw","분자량","g/mol"],["lel","LEL","%"],["tlv","TWA","ppm"],["k","안전계수 K",""]];
+  var EX={
+    ex1:{t:21,pt:25,c:4,mode:"add",comps:[{s:"mek",use:1.5,k:7}],
+      note:"예시 1 (강의): MEK 1.5 L/h, K = 7, 21℃ → 노출기준 환기량 235.44 m³/min"},
+    ex2:{t:25,pt:25,c:4,mode:"add",comps:[{s:"mek",use:2,k:4},{s:"toluene",use:2,k:5}],
+      note:"예시 2 (강의 예제 1): 접착제 공정 MEK 2 L/h(K=4) + 톨루엔 2 L/h(K=5), 25℃, 상가작용 → 948.07 m³/min"}
+  };
+  var $=function(id){return document.getElementById("c2-"+id)};
+  var fmt=function(x,n){return isFinite(x)?x.toLocaleString("ko-KR",{maximumFractionDigits:n,minimumFractionDigits:n}):"–"};
+  var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+  var comps=[];
+
+  function molarVol(t){ if(t===21) return 24.1; if(t===25) return 24.45; return 24.1*(273+t)/294; }
+
+  function compute(g,list){
+    var mv=molarVol(g.t), B=g.pt>=120?0.7:1.0;
+    var rows=list.map(function(c){
+      var kgh=c.use*c.sg;
+      var qLelH=mv*kgh*g.c*100/(c.mw*c.lel*B);     // m3/h
+      var qTlvH=mv*kgh*c.k*1e6/(c.mw*c.tlv);       // m3/h
+      return {c:c,kgh:kgh,qLel:qLelH/60,qTlv:qTlvH/60};
+    });
+    var lel=rows.reduce(function(s,r){return s+r.qLel},0);
+    var tlv=g.mode==="add"?rows.reduce(function(s,r){return s+r.qTlv},0):Math.max.apply(null,rows.map(function(r){return r.qTlv}));
+    var need=Math.max(lel,tlv);
+    // need 환기량에서 Σ(Cᵢ/LELᵢ) (안전계수 없이 실제 평균 농도 기준)
+    var frac=rows.reduce(function(s,r){return s+(mv*r.kgh*100/(r.c.mw*r.c.lel*B)/60)/need},0);
+    return {mv:mv,B:B,rows:rows,lel:lel,tlv:tlv,need:need,pct:frac*100};
+  }
+
+  function rowHtml(c,i){
+    var opts=Object.keys(DB).map(function(k){return '<option value="'+k+'"'+(k===c.s?" selected":"")+'>'+DB[k].n+'</option>'}).join("");
+    var cells=FIELDS.map(function(f){
+      return '<div class="field"><label for="c2-c'+i+f[0]+'">'+f[1]+'</label><div class="inp"><input id="c2-c'+i+f[0]+'" data-i="'+i+'" data-f="'+f[0]+'" type="number" step="any" min="0" value="'+esc(c[f[0]])+'">'+(f[2]?'<span>'+f[2]+'</span>':'')+'</div></div>';
+    }).join("");
+    return '<div class="comp"><div class="comp-head"><div class="field"><label for="c2-c'+i+'s">성분 '+(i+1)+'</label><div class="inp"><select id="c2-c'+i+'s" data-i="'+i+'" data-f="s">'+opts+'</select></div></div>'+
+      (comps.length>1?'<button type="button" class="del" data-del="'+i+'" aria-label="성분 '+(i+1)+' 삭제">삭제</button>':'')+
+      '</div><div class="comp-grid">'+cells+'</div>'+(DB[c.s].hot?'<p class="comp-src">이 물질의 LEL은 고온(93~100℃)에서 측정한 값입니다(NIOSH).</p>':'')+'</div>';
+  }
+  function drawComps(){ $("comps").innerHTML=comps.map(rowHtml).join(""); }
+
+  function mkComp(s,use,k){var d=DB[s];return {s:s,use:use,k:k,sg:d.sg,mw:d.mw,lel:d.lel,tlv:d.tlv};}
+
+  function readG(){
+    var g={t:parseFloat($("t").value),pt:parseFloat($("pt").value),c:parseFloat($("c").value),
+      mode:document.querySelector('input[name=mode]:checked').value};
+    if(!isFinite(g.t)||!isFinite(g.pt)||!(g.c>0)) return null;
+    return g;
+  }
+  function valid(c){return ["use","sg","mw","lel","tlv","k"].every(function(f){var x=parseFloat(c[f]);return isFinite(x)&&x>0})}
+
+  function table(rows,key,unitLabel,total,extraHead){
+    var h='<thead><tr><th>성분</th><th>발생량 kg/h</th>'+extraHead+'<th>m³/min</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(DB[r.c.s].n)+'</td><td>'+fmt(r.kgh,3)+'</td>'+(key==="qLel"?'<td>'+r.c.lel+'</td>':'<td>'+r.c.tlv+'</td><td>'+r.c.k+'</td>')+'<td>'+fmt(r[key],2)+'</td></tr>';
+    });
+    h+='</tbody><tfoot><tr><td colspan="'+(key==="qLel"?3:4)+'">'+unitLabel+'</td><td>'+fmt(total,2)+'</td></tr></tfoot>';
+    return h;
+  }
+
+  function render(){
+    var g=readG(), list=comps.map(function(c){var o={s:c.s};["use","sg","mw","lel","tlv","k"].forEach(function(f){o[f]=parseFloat(c[f])});return o;});
+    if(!g||!list.length||!list.every(valid)){
+      ["r-lel","r-lelh","r-tlv","r-tlvh","r-need","r-pct"].forEach(function(id){$(id).textContent="–"});
+      $("t-lel").innerHTML="";$("t-tlv").innerHTML="";$("bars").innerHTML="";$("scaleNote").textContent="";$("basis").textContent="";
+      $("r-mode").className="pill";$("r-mode").textContent="값을 모두 입력하세요";
+      $("r-insight").textContent="성분마다 사용량·비중·분자량·LEL·TWA·안전계수를 0보다 큰 값으로 넣어 주세요.";
+      return;
+    }
+    var r=compute(g,list);
+    $("r-lel").innerHTML=fmt(r.lel,2)+"<small>m³/min</small>";
+    $("r-lelh").innerHTML=fmt(r.lel*60,0)+"<small>m³/h</small>";
+    $("r-tlv").innerHTML=fmt(r.tlv,2)+"<small>m³/min</small>";
+    $("r-tlvh").innerHTML=fmt(r.tlv*60,0)+"<small>m³/h</small>";
+    $("t-lel").innerHTML=table(r.rows,"qLel","합계 (B = "+r.B+")",r.lel,"<th>LEL %</th>");
+    $("t-tlv").innerHTML=table(r.rows,"qTlv",g.mode==="add"?"상가작용: 합계":"독립작용: 가장 큰 값",r.tlv,"<th>TWA ppm</th><th>K</th>");
+    $("r-mode").className="pill ok";$("r-mode").textContent=g.mode==="add"?"상가작용 · 합":"독립작용 · 최대";
+
+    var max=Math.max(r.lel,r.tlv), useLog=max/Math.max(Math.min(r.lel,r.tlv),1e-9)>20;
+    var w=function(x){ if(!useLog) return x/max*100; var lo=Math.log10(Math.min(r.lel,r.tlv)/3), hi=Math.log10(max); return Math.max(2,(Math.log10(x)-lo)/(hi-lo)*100); };
+    var bar=function(name,x,col){var p=w(x);return '<div class="bar"><span class="name">'+name+'</span><div class="track"><div class="fill" style="width:'+p.toFixed(1)+'%;background:'+col+'"></div><span class="val" style="left:calc('+Math.min(p,72).toFixed(1)+'% + 8px)">'+fmt(x,1)+' m³/min</span></div></div>';};
+    $("bars").innerHTML=bar("폭발방지",r.lel,"var(--fire)")+bar("노출기준",r.tlv,"var(--health)");
+    $("scaleNote").textContent=useLog?"차이가 커서 막대 길이는 로그 눈금입니다.":"막대 길이는 실제 비율입니다.";
+    var ratio=r.tlv/r.lel;
+    $("r-insight").textContent= ratio>=1 ?
+      "노출기준 환기량이 폭발방지 환기량의 "+fmt(ratio,ratio>=10?0:1)+"배입니다. 작업자 건강 기준으로 환기하면 증기 농도는 LEL의 "+fmt(r.pct,2)+"%에 그칩니다. 사람이 일하는 곳은 노출기준이 설계를 정합니다." :
+      "이 조건에서는 폭발방지 환기량이 노출기준 환기량보다 "+fmt(1/ratio,1)+"배 큽니다. 폭발 기준으로 설계해야 합니다.";
+    $("r-need").innerHTML=fmt(r.need,2)+"<small>m³/min</small>";
+    $("r-pct").innerHTML=fmt(r.pct,2)+"<small>% LEL</small>";
+
+    var lines=["① 기체 1mol 부피 = "+r.mv.toFixed(2)+" L ("+g.t+"℃), B = "+r.B+" (공정 "+g.pt+"℃), C = "+g.c];
+    r.rows.forEach(function(x,i){
+      var c=x.c,nm=DB[c.s].n;
+      lines.push("② "+nm+": 발생량 = "+c.use+" L/h × "+c.sg+" = "+fmt(x.kgh,3)+" kg/h");
+      lines.push("   폭발 Q = "+r.mv.toFixed(2)+" × "+fmt(x.kgh,3)+" × "+g.c+" × 10² / ("+c.mw+" × "+c.lel+" × "+r.B+") ÷ 60 = "+fmt(x.qLel,2)+" m³/min");
+      lines.push("   노출 Q = "+r.mv.toFixed(2)+" × "+fmt(x.kgh,3)+" × "+c.k+" × 10⁶ / ("+c.mw+" × "+c.tlv+") ÷ 60 = "+fmt(x.qTlv,2)+" m³/min");
+    });
+    lines.push("③ 폭발방지 합계 = "+fmt(r.lel,2)+" m³/min");
+    lines.push("④ 노출기준 "+(g.mode==="add"?"합계":"최대")+" = "+fmt(r.tlv,2)+" m³/min");
+    lines.push("⑤ 필요 환기량 = 큰 값 = "+fmt(r.need,2)+" m³/min");
+    $("basis").textContent=lines.join("\n");
+    save(g);
+  }
+
+  function save(g){try{localStorage.setItem("lelcalc",JSON.stringify({g:g,comps:comps}))}catch(e){}}
+
+  function load(p){
+    $("t").value=p.t;$("pt").value=p.pt;$("c").value=p.c;
+    document.querySelector('input[name=mode][value='+p.mode+']').checked=true;
+    comps=p.comps.map(function(c){return c.sg!==undefined?c:mkComp(c.s,c.use,c.k)});
+    $("exNote").textContent=p.note||"";
+    drawComps();render();
+  }
+
+  $("comps").addEventListener("input",function(e){
+    var el=e.target,i=+el.dataset.i,f=el.dataset.f; if(!f||f==="s")return;
+    comps[i][f]=el.value; render();
+  });
+  $("comps").addEventListener("change",function(e){
+    var el=e.target; if(el.dataset.f!=="s")return;
+    var i=+el.dataset.i, d=DB[el.value];
+    comps[i]=Object.assign(comps[i],{s:el.value,sg:d.sg,mw:d.mw,lel:d.lel,tlv:d.tlv});
+    drawComps();render();
+    var s=$("c"+i+"s"); if(s) s.focus();
+  });
+  $("comps").addEventListener("click",function(e){
+    var b=e.target.closest("[data-del]"); if(!b)return;
+    comps.splice(+b.dataset.del,1); drawComps(); render();
+  });
+  $("add").addEventListener("click",function(){comps.push(mkComp("toluene",1,5));drawComps();render();});
+  $("cond").addEventListener("input",render);
+  $("ex1").addEventListener("click",function(){load(EX.ex1)});
+  $("ex2").addEventListener("click",function(){load(EX.ex2)});
+  $("reset").addEventListener("click",function(){
+    try{localStorage.removeItem("lelcalc")}catch(e){}
+    load({t:21,pt:25,c:4,mode:"add",comps:[{s:"custom",use:"",k:""}]});
+  });
+  $("form").addEventListener("submit",function(e){e.preventDefault()});
+  $("copy").addEventListener("click",function(){
+    var txt=$("basis").textContent,btn=this;
+    var done=function(){btn.textContent="복사했습니다";setTimeout(function(){btn.textContent="계산 근거 복사"},1500)};
+    var sel=function(){var r=document.createRange();r.selectNodeContents($("basis"));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="선택했습니다. 복사하세요";};
+    try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}
+  });
+
+  var saved=null;try{saved=JSON.parse(localStorage.getItem("lelcalc")||"null")}catch(e){}
+  if(saved&&saved.g&&saved.comps&&saved.comps.length){var p=saved.g;p.comps=saved.comps;load(p);}
+  else load(EX.ex2);
+})();
+
+/* 소화기·스프링클러 수원 */
+
+(function(){
+  // a: 표 1.6 기준면적(㎡/단위), sp: 표 4.7 분류, red: 소형 소화기 2/3 감소 가능 여부(소화설비론 1.4.4 단서)
+  var USES=[
+    {k:"amuse",n:"위락시설",a:30,sp:"etc",red:false},
+    {k:"assembly",n:"공연장·집회장·관람장",a:50,sp:"etc",red:false},
+    {k:"medical",n:"의료시설",a:50,sp:"etc",red:false},
+    {k:"heritage",n:"문화재·장례식장",a:50,sp:"etc",red:true},
+    {k:"neighbor",n:"근린생활시설",a:100,sp:"retail",red:false},
+    {k:"sales",n:"판매시설·영업시설",a:100,sp:"retail",red:false},
+    {k:"lodging",n:"숙박·노유자·업무·전시·운수·관광휴게시설",a:100,sp:"etc",red:false},
+    {k:"apt",n:"공동주택(아파트)",a:100,sp:"apt",red:false},
+    {k:"factory",n:"공장",a:100,sp:"factory",red:true},
+    {k:"storage",n:"창고시설",a:100,sp:"factory",red:true},
+    {k:"broadcast",n:"방송통신시설",a:100,sp:"etc",red:false},
+    {k:"aircar",n:"항공기·자동차 관련 시설",a:100,sp:"etc",red:false},
+    {k:"other",n:"그 밖의 것",a:200,sp:"etc",red:true}
+  ];
+  var ids=["use","area","fl","unit","heads"], checks=["fire","red","spec","mart","h8","sub"];
+  var EX={
+    ex1:{use:"sales",area:2000,fl:5,unit:3,heads:"",fire:true,red:false,spec:false,mart:true,h8:false,sub:false,
+      note:"예시 1: 지상 5층 대형마트, 한 층 2,000㎡, 내화구조 + 불연 마감, 3단위 소화기"},
+    ex2:{use:"factory",area:1500,fl:2,unit:3,heads:"",fire:false,red:true,spec:true,mart:false,h8:false,sub:false,
+      note:"예시 2: 지상 2층 공장, 한 층 1,500㎡, 특수가연물 취급, 스프링클러 있음 → 소화기 2/3 감소"}
+  };
+  var $=function(id){return document.getElementById("c3-"+id)};
+  var fmt=function(x,n){return isFinite(x)?x.toLocaleString("ko-KR",{maximumFractionDigits:n,minimumFractionDigits:n}):"–"};
+  var useOf=function(k){for(var i=0;i<USES.length;i++)if(USES[i].k===k)return USES[i];return USES[0]};
+  $("use").innerHTML=USES.map(function(u){return '<option value="'+u.k+'">'+u.n+'</option>'}).join("");
+
+  // 표 4.7 폐쇄형 헤드 기준개수
+  function baseHeads(v,u){
+    if(v.sub) return {n:30,row:"sub"};
+    if(u.sp==="apt") return {n:10,row:"apt"};
+    if(v.fl>=11) return {n:30,row:"high"};
+    if(u.sp==="factory") return v.spec?{n:30,row:"f30"}:{n:20,row:"f20"};
+    if(u.sp==="retail") return v.mart?{n:30,row:"r30"}:{n:20,row:"r20"};
+    return v.h8?{n:20,row:"e20"}:{n:10,row:"e10"};
+  }
+
+  function compute(v){
+    var u=useOf(v.use);
+    var a=u.a*(v.fire?2:1);
+    var units=Math.ceil(v.area/a);
+    var canRed=u.red, redOn=v.red&&canRed;
+    var floorsRed=redOn?Math.min(v.fl,10):0;          // 11층 이상 부분은 감소 불가
+    var unitsRed=Math.ceil(units/3);
+    var cnt=Math.ceil(units/v.unit), cntRed=Math.ceil(unitsRed/v.unit);
+    var total=cntRed*floorsRed+cnt*(v.fl-floorsRed);
+    var b=baseHeads(v,u);
+    var N=(v.heads>0&&v.heads<b.n)?v.heads:b.n;
+    var per=v.fl>=50?4.8:v.fl>=30?3.2:1.6, min=v.fl>=50?60:v.fl>=30?40:20;
+    return {u:u,a:a,units:units,unitsRed:unitsRed,canRed:canRed,redOn:redOn,floorsRed:floorsRed,cnt:cnt,cntRed:cntRed,total:total,b:b,N:N,per:per,min:min,q:N*per};
+  }
+
+  function read(){
+    var v={};
+    v.use=$("use").value;
+    ["area","fl","unit"].forEach(function(id){v[id]=parseFloat($(id).value)});
+    var h=parseFloat($("heads").value); v.heads=isFinite(h)?Math.floor(h):0;
+    checks.forEach(function(id){v[id]=$(id).checked});
+    if(!(v.area>0)||!(v.fl>=1)||!(v.unit>=1)) return null;
+    v.fl=Math.floor(v.fl); return v;
+  }
+
+  var EXT='<svg viewBox="0 0 22 34"><rect x="5" y="9" width="12" height="24" rx="4" fill="currentColor"/><rect x="8" y="4" width="6" height="6" rx="1" fill="currentColor"/><path d="M14 6h5v3" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+
+  function tank(q){
+    var cap=Math.max(50,Math.ceil(q/50)*50), h=Math.max(4,96*q/cap);
+    $("tank").innerHTML='<rect x="8" y="12" width="80" height="100" rx="6" fill="none" stroke="var(--line)" stroke-width="2"/>'+
+      '<rect x="10" y="'+(110-h).toFixed(1)+'" width="76" height="'+h.toFixed(1)+'" rx="4" fill="var(--water)" opacity=".85"/>'+
+      '<text x="48" y="9" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="var(--f-num)">'+cap+' m³ 눈금</text>';
+  }
+
+  function tables(v,r){
+    var a16=[["위락시설",30],["공연장·집회장·관람장·문화재·장례식장·의료시설",50],["근린생활·판매·운수·숙박·노유자·전시장·공동주택·업무·창고·방송통신·공장·항공기·자동차 관련 등",100],["그 밖의 것",200]];
+    var h='<thead><tr><th>표 1.6 소방대상물</th><th>기준면적</th><th>내화+불연</th></tr></thead><tbody>';
+    a16.forEach(function(x){h+='<tr'+(x[1]===r.u.a?' class="on"':'')+'><td>'+x[0]+'</td><td class="n">'+x[1]+'㎡</td><td class="n">'+x[1]*2+'㎡</td></tr>'});
+    $("t16").innerHTML=h+'</tbody>';
+    var a47=[["f30","공장·창고: 특수가연물 저장·취급",30],["f20","공장·창고: 그 밖의 것",20],["r30","근린생활·판매·영업·복합건축물: 슈퍼마켓·도매·소매시장 등",30],["r20","근린생활·판매·영업·복합건축물: 그 밖의 것",20],["e20","그 밖의 것: 헤드 부착높이 8m 이상",20],["e10","그 밖의 것: 헤드 부착높이 8m 미만",10],["apt","아파트",10],["high","11층 이상(아파트 제외)",30],["sub","지하가·지하역사",30]];
+    h='<thead><tr><th>표 4.7 설치장소 (10층 이하는 위 6줄)</th><th>헤드 수</th></tr></thead><tbody>';
+    a47.forEach(function(x){h+='<tr'+(x[0]===r.b.row?' class="on"':'')+'><td>'+x[1]+'</td><td class="n">'+x[2]+'</td></tr>'});
+    $("t47").innerHTML=h+'</tbody>';
+  }
+
+  function render(){
+    var u=useOf($("use").value);
+    $("w-spec").hidden=u.sp!=="factory"; $("w-mart").hidden=u.sp!=="retail"; $("w-h8").hidden=u.sp!=="etc";
+    var v=read();
+    if(!v){["r-units","r-cnt","r-total","r-q","r-n","r-min"].forEach(function(id){$(id).textContent="–"});
+      $("r-icons").innerHTML="";$("r-ext-note").textContent="바닥면적, 층수, 소화기 능력단위를 넣어 주세요.";
+      $("r-redpill").className="pill";$("r-redpill").textContent="입력 대기";
+      $("r-formula").textContent="";$("r-sp-note").textContent="";$("basis").textContent="";$("tank").innerHTML="";return;}
+    var r=compute(v);
+    var showRed=r.redOn;
+    $("r-units").innerHTML=fmt(showRed?r.unitsRed:r.units,0)+"<small>단위</small>";
+    $("r-cnt").innerHTML=fmt(showRed?r.cntRed:r.cnt,0)+"<small>개</small>";
+    $("r-total").innerHTML=fmt(r.total,0)+"<small>개</small>";
+    var c=showRed?r.cntRed:r.cnt, icons="";
+    for(var i=0;i<Math.min(c,30);i++) icons+=EXT;
+    $("r-icons").innerHTML=icons+(c>30?'<span class="more">+'+(c-30)+'</span>':'');
+    if(v.red&&!r.canRed){$("r-redpill").className="pill warn";$("r-redpill").textContent="감소 불가 용도";}
+    else if(showRed){$("r-redpill").className="pill ok";$("r-redpill").textContent="2/3 감소 적용";}
+    else {$("r-redpill").className="pill";$("r-redpill").textContent="감소 없음";}
+    var note="기준면적 "+r.a+"㎡마다 1단위"+(v.fire?"(내화구조 + 불연 마감으로 2배)":"")+". "+fmt(v.area,0)+" ÷ "+r.a+" = "+fmt(v.area/r.a,2)+" → 올림 "+r.units+"단위.";
+    if(showRed) note+=" 감소 후 "+r.units+" ÷ 3 → 올림 "+r.unitsRed+"단위"+(v.fl>10?" (11층 이상 "+(v.fl-10)+"개 층은 감소 없이 "+r.cnt+"개)":"")+".";
+    if(v.red&&!r.canRed) note+=" "+r.u.n+"은(는) 스프링클러가 있어도 소형 소화기를 줄일 수 없습니다.";
+    $("r-ext-note").textContent=note;
+
+    $("r-q").innerHTML=fmt(r.q,1)+"<small>m³</small>";
+    $("r-n").innerHTML=r.N+"<small>개</small>";
+    $("r-min").innerHTML=r.min+"<small>분</small>";
+    $("r-formula").textContent="Q = N × 80 L/min × "+r.min+" min = "+r.N+" × "+r.per+" m³ = "+fmt(r.q,1)+" m³";
+    var sp=r.N<r.b.n?"설치 헤드가 "+r.N+"개로 기준개수 "+r.b.n+"개보다 적어 설치 개수를 씁니다. ":"";
+    sp+="수원 "+fmt(r.q,1)+"m³는 "+(r.q>=1?"가로 "+fmt(Math.sqrt(r.q/2),1)+"m × 세로 "+fmt(Math.sqrt(r.q/2),1)+"m × 깊이 2m":"작은")+" 수조 크기입니다"+(v.fl>=30?". "+v.fl+"층 건물이라 방수 시간이 "+r.min+"분으로 늘어 헤드당 "+r.per+"m³를 씁니다.":".");
+    $("r-sp-note").textContent=sp;
+    tank(r.q); tables(v,r);
+
+    $("basis").textContent=
+      "① 용도: "+r.u.n+" → 기준면적 "+r.u.a+"㎡"+(v.fire?" × 2 = "+r.a+"㎡":"")+"\n"+
+      "② 능력단위 = "+fmt(v.area,0)+" ÷ "+r.a+" = "+fmt(v.area/r.a,2)+" → "+r.units+" 단위/층\n"+
+      (showRed?"   2/3 감소: "+r.units+" × 1/3 → "+r.unitsRed+" 단위/층 (10층 이하 "+r.floorsRed+"개 층)\n":"")+
+      "③ 소화기 = "+(showRed?r.unitsRed:r.units)+" ÷ "+v.unit+"단위 → "+(showRed?r.cntRed:r.cnt)+" 개/층, 건물 "+v.fl+"개 층 합계 "+r.total+" 개\n"+
+      "④ 스프링클러 기준개수 N = "+r.b.n+(r.N<r.b.n?" → 설치 "+r.N:"")+" (표 4.7)\n"+
+      "⑤ 수원 Q = "+r.N+" × "+r.per+" m³ ("+v.fl+"층, "+r.min+"분) = "+fmt(r.q,1)+" m³";
+    try{localStorage.setItem("extcalc",JSON.stringify(v))}catch(e){}
+  }
+
+  function fill(p){
+    ids.forEach(function(id){$(id).value=p[id]===undefined||p[id]===0&&id==="heads"?"":p[id]});
+    checks.forEach(function(id){$(id).checked=!!p[id]});
+    $("exNote").textContent=p.note||"";render();
+  }
+  $("ex1").addEventListener("click",function(){fill(EX.ex1)});
+  $("ex2").addEventListener("click",function(){fill(EX.ex2)});
+  $("reset").addEventListener("click",function(){try{localStorage.removeItem("extcalc")}catch(e){}
+    fill({use:"other",area:"",fl:"",unit:3,heads:""});});
+  $("form").addEventListener("input",render);
+  $("form").addEventListener("change",render);
+  $("form").addEventListener("submit",function(e){e.preventDefault()});
+  $("copy").addEventListener("click",function(){
+    var txt=$("basis").textContent,btn=this;
+    var done=function(){btn.textContent="복사했습니다";setTimeout(function(){btn.textContent="계산 근거 복사"},1500)};
+    var sel=function(){var r=document.createRange();r.selectNodeContents($("basis"));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="선택했습니다. 복사하세요";};
+    try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}
+  });
+  var saved=null;try{saved=JSON.parse(localStorage.getItem("extcalc")||"null")}catch(e){}
+  fill(saved||EX.ex1);
+})();
+
+/* 제연설비 배출량 */
+
+(function(){
+  // NFTC 501 수직거리별 배출량 (m³/h). 행: ≤2, 2~2.5, 2.5~3, >3 m
+  var T={
+    r1:{s:"거실 40m 원 안",n:"거실 400㎡ 이상, 40m 원 안 (표 2.3.2.1)",v:[40000,45000,50000,60000]},
+    r2:{s:"거실 40m 원 초과",n:"거실 40m 원 초과 (표 2.3.2.2)",v:[45000,50000,55000,65000]},
+    p1:{s:"통로 40m 이하",n:"통로배출, 보행중심선 40m 이하 (표 2.3.1.2)",v:[25000,30000,35000,45000]},
+    p2:{s:"통로 40~60m",n:"통로배출, 40m 초과 60m 이하 (표 2.3.1.2)",v:[30000,35000,40000,50000]}
+  };
+  var ROWS=["2m 이하","2m 초과 2.5m 이하","2.5m 초과 3m 이하","3m 초과"];
+  var ids=["kind","area","circle","walk","bound","hv","p","eta","alpha"];
+  var EX={
+    ex1:{kind:"room",area:600,circle:"in",walk:"",bound:"curtain",hv:2.2,p:60,eta:0.6,alpha:1.2,note:"예시 1: 바닥 600㎡ 거실, 직경 40m 원 안, 제연경계 수직거리 2.2m, 전압 60mmAq · 효율 0.6 · 여유율 1.2(예시값)"},
+    ex2:{kind:"room",area:300,circle:"in",walk:"",bound:"wall",hv:"",p:40,eta:0.6,alpha:1.2,note:"예시 2: 바닥 300㎡ 거실, 벽으로 구획"}
+  };
+  var $=function(id){return document.getElementById("c4-"+id)};
+  var fmt=function(x,n){return isFinite(x)?x.toLocaleString("ko-KR",{maximumFractionDigits:n,minimumFractionDigits:n}):"–"};
+  var rowOf=function(h){return h<=2?0:h<=2.5?1:h<=3?2:3};
+  function steel(mm){return mm<=450?0.5:mm<=750?0.6:mm<=1500?0.8:mm<=2250?1.0:1.2}
+
+  function compute(v){
+    var Qh,rule,key=null,row=null;
+    if(v.kind==="path"){
+      key=v.walk<=40?"p1":"p2"; row=rowOf(v.hv); Qh=T[key].v[row];
+      rule="통로배출방식: 보행중심선 "+v.walk+"m, 수직거리 "+v.hv+"m → 표 2.3.1.2";
+    } else if(v.area<400){
+      Qh=Math.max(v.area*60,5000);
+      rule="400㎡ 미만 거실: 1㎡당 1m³/min 이상 = "+fmt(v.area,0)+" × 60 = "+fmt(v.area*60,0)+" m³/h"+(v.area*60<5000?" → 최저 5,000 m³/h 적용":"");
+    } else if(v.bound==="wall"){
+      Qh=v.circle==="in"?40000:45000;
+      rule="400㎡ 이상 거실, 벽 구획: 직경 40m 원 "+(v.circle==="in"?"안 → 40,000":"초과 → 45,000")+" m³/h 이상";
+    } else {
+      key=v.circle==="in"?"r1":"r2"; row=rowOf(v.hv); Qh=T[key].v[row];
+      rule="400㎡ 이상 거실, 제연경계 수직거리 "+v.hv+"m → "+(key==="r1"?"표 2.3.2.1":"표 2.3.2.2");
+    }
+    var Qm=Qh/60,Qs=Qh/3600;
+    var duct=[["흡입측",15],["배출측",20]].map(function(x){var D=Math.sqrt(4*Qs/(Math.PI*x[1]))*1000;return {n:x[0],V:x[1],D:D,t:steel(D)}});
+    var inlet=Qm*35/10000;                       // m²
+    var vin=Qs/inlet;
+    var kw=(v.p>0&&v.eta>0)?Qm*v.p/(6120*v.eta)*(v.alpha>0?v.alpha:1):NaN;
+    return {Qh:Qh,Qm:Qm,Qs:Qs,rule:rule,key:key,row:row,duct:duct,inlet:inlet,vin:vin,kw:kw};
+  }
+
+  function read(){
+    var v={kind:$("kind").value,circle:$("circle").value,bound:$("bound").value};
+    ["area","walk","hv","p","eta","alpha"].forEach(function(id){v[id]=parseFloat($(id).value)});
+    if(!(v.area>0)) return null;
+    var needHv=v.kind==="path"||(v.area>=400&&v.bound==="curtain");
+    if(needHv&&!(v.hv>0)) return null;
+    if(v.kind==="path"&&!(v.walk>0&&v.walk<=60)) return null;
+    return v;
+  }
+
+  function showFields(){
+    var kind=$("kind").value,a=parseFloat($("area").value),big=kind==="room"&&a>=400;
+    $("w-circle").hidden=!big;
+    $("w-walk").hidden=kind!=="path";
+    $("w-hv").hidden=!(kind==="path"||(big&&$("bound").value==="curtain"));
+    $("bound").parentNode.parentNode.hidden=kind==="path"||!big;
+  }
+
+  function ductSvg(D,max){
+    var r=Math.max(6,28*D/max);
+    return '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="'+r.toFixed(1)+'" fill="var(--smoke)" opacity=".35" stroke="var(--smoke)" stroke-width="2"/></svg>';
+  }
+
+  function render(){
+    showFields();
+    var v=read();
+    if(!v){["r-qh","r-qm","r-qs","r-inlet","r-vin","r-kw"].forEach(function(id){$(id).textContent="–"});
+      $("r-rule").textContent="바닥면적과 필요한 칸(수직거리, 보행중심선 길이)을 넣어 주세요.";
+      $("ducts").innerHTML="";$("t-v").innerHTML="";$("r-insight").textContent="";$("basis").textContent="";
+      $("r-zone").className="pill";$("r-zone").textContent="입력 대기";return;}
+    var r=compute(v);
+    $("r-qh").innerHTML=fmt(r.Qh,0)+"<small>m³/h</small>";
+    $("r-qm").innerHTML=fmt(r.Qm,0)+"<small>m³/min</small>";
+    $("r-qs").innerHTML=fmt(r.Qs,2)+"<small>m³/s</small>";
+    $("r-rule").textContent=r.rule+".";
+    if(v.area>1000){$("r-zone").className="pill warn";$("r-zone").textContent="1,000㎡ 초과 · 구역을 나누세요";}
+    else {$("r-zone").className="pill ok";$("r-zone").textContent="제연구역 면적 적합";}
+    var h='<thead><tr><th>수직거리 (m³/h)</th>'+Object.keys(T).map(function(k){return '<th>'+T[k].s+'</th>'}).join("")+'</tr></thead><tbody>';
+    ROWS.forEach(function(rn,i){h+='<tr><td>'+rn+'</td>'+Object.keys(T).map(function(k){return '<td'+(k===r.key&&i===r.row?' class="on"':'')+'>'+fmt(T[k].v[i],0)+'</td>'}).join("")+'</tr>'});
+    $("t-v").innerHTML=h+'</tbody>';
+    var max=Math.max.apply(null,r.duct.map(function(d){return d.D}));
+    $("ducts").innerHTML=r.duct.map(function(d){return '<div class="duct">'+ductSvg(d.D,max)+'<div><div class="t">'+d.n+' · 풍속 '+d.V+'m/s 이하</div><div class="d">Ø '+fmt(Math.ceil(d.D/10)*10,0)+' mm</div><div class="s">강판 두께 '+d.t.toFixed(1)+'mm 이상</div></div></div>'}).join("");
+    $("r-inlet").innerHTML=fmt(r.inlet,2)+"<small>m²</small>";
+    $("r-vin").innerHTML=fmt(r.vin,2)+"<small>m/s</small>";
+    $("r-kw").innerHTML=isFinite(r.kw)?fmt(r.kw,1)+"<small>kW</small>":"–";
+    $("r-insight").textContent="유입구를 배출량 1m³/min당 35㎠로 만들면 유입 풍속이 약 "+fmt(r.vin,2)+"m/s가 되어 5m/s 기준을 자동으로 만족합니다. 두 기준이 같은 뜻이라는 걸 보여 줍니다."+
+      (isFinite(r.kw)?" 배출기와 비상전원은 이 동력으로 20분 이상 돌릴 수 있어야 합니다.":"");
+    var d=r.duct;
+    $("basis").textContent=
+      "① "+r.rule+"\n   Q = "+fmt(r.Qh,0)+" m³/h = "+fmt(r.Qm,1)+" m³/min = "+fmt(r.Qs,3)+" m³/s\n"+
+      "② 흡입측 D = √(4 × "+fmt(r.Qs,3)+" / (π × 15)) = "+fmt(d[0].D,0)+" mm → 강판 "+d[0].t.toFixed(1)+" mm\n"+
+      "   배출측 D = √(4 × "+fmt(r.Qs,3)+" / (π × 20)) = "+fmt(d[1].D,0)+" mm → 강판 "+d[1].t.toFixed(1)+" mm\n"+
+      "③ 공기유입구 = "+fmt(r.Qm,1)+" × 35 ㎠ = "+fmt(r.inlet*10000,0)+" ㎠ = "+fmt(r.inlet,2)+" m²\n"+
+      "   유입 풍속 = "+fmt(r.Qs,3)+" / "+fmt(r.inlet,3)+" = "+fmt(r.vin,2)+" m/s\n"+
+      (isFinite(r.kw)?"④ 동력 = Q × P / (6120 × η) × α = "+fmt(r.Qm,1)+" × "+v.p+" / (6120 × "+v.eta+") × "+(v.alpha||1)+" = "+fmt(r.kw,2)+" kW":"④ 동력: 전압·효율을 넣으면 계산합니다");
+    try{localStorage.setItem("smokecalc",JSON.stringify(v))}catch(e){}
+  }
+
+  function fill(p){ids.forEach(function(id){$(id).value=(p[id]===undefined||p[id]===null||(typeof p[id]==="number"&&!isFinite(p[id])))?"":p[id]});$("exNote").textContent=p.note||"";render();}
+  $("ex1").addEventListener("click",function(){fill(EX.ex1)});
+  $("ex2").addEventListener("click",function(){fill(EX.ex2)});
+  $("reset").addEventListener("click",function(){try{localStorage.removeItem("smokecalc")}catch(e){}
+    fill({kind:"room",area:"",circle:"in",walk:"",bound:"wall",hv:"",p:"",eta:0.6,alpha:1.2});});
+  $("form").addEventListener("input",render);
+  $("form").addEventListener("change",render);
+  $("form").addEventListener("submit",function(e){e.preventDefault()});
+  $("copy").addEventListener("click",function(){
+    var txt=$("basis").textContent,btn=this;
+    var done=function(){btn.textContent="복사했습니다";setTimeout(function(){btn.textContent="계산 근거 복사"},1500)};
+    var sel=function(){var r=document.createRange();r.selectNodeContents($("basis"));var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent="선택했습니다. 복사하세요";};
+    try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}
+  });
+  var saved=null;try{saved=JSON.parse(localStorage.getItem("smokecalc")||"null")}catch(e){}
+  fill(saved||EX.ex1);
+})();
+
+
+/* 화면 전환: #home, #co2, #co2-guide … (주소 끝 표시만 쓰고 요소 id와 겹치지 않게 s- 접두어 사용) */
+(function(){
+  var keys=Array.prototype.map.call(document.querySelectorAll("section.calc"),function(s){return s.dataset.key});
+  var sub=document.getElementById("subnav");
+  var cur="home";
+  function show(hash,keepScroll){
+    var h=(hash||"").replace(/^#/,""), parts=h.split("-"), key=parts[0], pane=parts[1]==="guide"?"guide":"calc";
+    if(keys.indexOf(key)<0) key="home";
+    cur=key;
+    document.getElementById("s-home").hidden=key!=="home";
+    keys.forEach(function(k){
+      var s=document.getElementById("s-"+k); s.hidden=k!==key;
+      if(k===key) s.querySelectorAll(":scope > .pane").forEach(function(p){p.hidden=p.dataset.pane!==pane});
+    });
+    sub.hidden=key==="home";
+    sub.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-selected",String(b.dataset.pane===pane))});
+    document.querySelectorAll(".tabs a").forEach(function(a){if(a.dataset.go===key)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+    var t=document.querySelector('.tabs a[aria-current="page"]'); if(t&&t.scrollIntoView) t.scrollIntoView({block:"nearest",inline:"nearest"});
+    if(!keepScroll) window.scrollTo(0,0);
+  }
+  sub.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-pane]"); if(!b||cur==="home")return;
+    location.hash=cur+(b.dataset.pane==="guide"?"-guide":"");
+  });
+  document.addEventListener("click",function(e){
+    var b=e.target.closest(".g-try"); if(!b)return;
+    var art=b.closest(".guide"), sec=b.closest("section.calc");
+    location.hash=sec.dataset.key;
+    var btn=document.getElementById(art.dataset.pfx+b.dataset.try); if(btn) btn.click();
+  });
+  window.addEventListener("hashchange",function(){show(location.hash)});
+  show(location.hash,true);
+})();
+</script>
+
+</body>
+</html>
